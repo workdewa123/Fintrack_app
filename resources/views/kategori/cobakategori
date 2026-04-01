@@ -1,0 +1,578 @@
+@extends('layout.app')
+
+@section('head')
+{{-- Memuat pustaka Iconify dari CDN --}}
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+@endsection
+
+@section('content')
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    /* Tabs */
+    .tabs-container .nav-link {
+        color: #a0aec0;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .tabs-container .nav-link.active {
+        color: #3b82f6;
+        border-bottom: 2px solid #3b82f6;
+    }
+
+    /* Category List Style - New design to match Figma */
+    .category-list {
+        margin-top: 2rem;
+    }
+
+    .category-list-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        background-color: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        margin-bottom: 1rem;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .category-list-item:hover {
+        transform: translateY(-5px);
+    }
+
+    .category-icon-box {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+
+    .category-icon {
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .category-label {
+        flex-grow: 1;
+        font-weight: 600;
+        font-size: 1rem;
+        color: #1f2937;
+    }
+
+    .category-actions {
+        display: flex;
+        gap: 0.5rem;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .category-list-item:hover .category-actions {
+        opacity: 1;
+    }
+
+    .category-actions button {
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: white;
+        cursor: pointer;
+    }
+
+    .btn-edit {
+        background-color: #22c55e;
+    }
+
+    .btn-delete {
+        background-color: #ef4444;
+    }
+
+    .add-category-box {
+        background-color: #e5e7eb;
+    }
+
+    .add-category-box .category-icon {
+        color: #6b7280;
+    }
+
+    /* Styling for the Profile Icon and Tiara */
+    .user-profile-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .user-profile-icon {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #fca5a5;
+        /* Placeholder color */
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .user-profile-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .tiara-icon {
+        font-size: 1.5rem;
+        color: gold;
+        margin-left: -10px;
+        /* Adjust position to overlap slightly */
+        z-index: 10;
+        transform: rotate(20deg);
+    }
+
+    .hidden-input {
+        display: none;
+    }
+</style>
+
+<div class="container-fluid p-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Kategori Keuangan</h2>
+        <div class="user-profile d-flex align-items-center gap-2">
+
+            {{-- Bagian Ikon Profil yang Dapat Diklik --}}
+            <label for="profileImageInput" class="user-profile-icon">
+                <img id="profileImage" src="{{ asset('images/avatar-placeholder.png') }}" alt="User Profile">
+            </label>
+            <input type="file" id="profileImageInput" class="hidden-input" accept="image/*">
+
+            {{-- Bagian Ikon Tiara --}}
+            <iconify-icon icon="emojione:crown" class="tiara-icon"></iconify-icon>
+
+        </div>
+    </div>
+
+
+    {{-- Tabs --}}
+    <div class="tabs-container mb-4">
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link active" data-filter="all">Semua</a></li>
+            <li class="nav-item"><a class="nav-link" data-filter="income">Pemasukan</a></li>
+            <li class="nav-item"><a class="nav-link" data-filter="expense">Pengeluaran</a></li>
+        </ul>
+    </div>
+
+    {{-- Category List --}}
+    <div class="category-list" id="categoryList">
+        @php
+        $categories = [
+        // Pemasukan
+        ['id' => 1, 'label' => 'Gaji', 'icon' => 'ic:round-attach-money', 'color' => '#22c55e', 'type' => 'income'],
+        ['id' => 2, 'label' => 'Bonus', 'icon' => 'ic:round-star', 'color' => '#f59e0b', 'type' => 'income'],
+        ['id' => 3, 'label' => 'Hasil Jualan', 'icon' => 'ic:round-local-offer', 'color' => '#facc15', 'type' => 'income'],
+        ['id' => 4, 'label' => 'Freelance', 'icon' => 'ic:round-work', 'color' => '#d97706', 'type' => 'income'],
+        ['id' => 5, 'label' => 'Uang Saku', 'icon' => 'ic:round-monetization-on', 'color' => '#0d9488', 'type' => 'income'],
+        ['id' => 6, 'label' => 'Bunga', 'icon' => 'ic:round-account-balance', 'color' => '#a855f7', 'type' => 'income'],
+        ['id' => 7, 'label' => 'Investasi', 'icon' => 'ic:round-trending-up', 'color' => '#2563eb', 'type' => 'income'],
+
+        // Pengeluaran
+        ['id' => 8, 'label' => 'Kesehatan', 'icon' => 'ic:round-favorite', 'color' => '#ef4444', 'type' => 'expense'],
+        ['id' => 9, 'label' => 'Rumah', 'icon' => 'ic:round-house', 'color' => '#f59e0b', 'type' => 'expense'],
+        ['id' => 10, 'label' => 'Cafe', 'icon' => 'ic:round-local-cafe', 'color' => '#6366f1', 'type' => 'expense'],
+        ['id' => 11, 'label' => 'Pendidikan', 'icon' => 'ic:round-school', 'color' => '#3b82f6', 'type' => 'expense'],
+        ['id' => 12, 'label' => 'Hadiah', 'icon' => 'ic:round-card-giftcard', 'color' => '#db2777', 'type' => 'expense'],
+        ['id' => 13, 'label' => 'Bahan Makanan', 'icon' => 'ic:round-shopping-cart', 'color' => '#16a34a', 'type' => 'expense'],
+        ['id' => 14, 'label' => 'Transportasi', 'icon' => 'ic:round-directions-bus', 'color' => '#6b7280', 'type' => 'expense'],
+        ['id' => 15, 'label' => 'Keluarga', 'icon' => 'ic:round-family-restroom', 'color' => '#6b7280', 'type' => 'expense'],
+        ['id' => 16, 'label' => 'Olahraga', 'icon' => 'ic:round-fitness-center', 'color' => '#ef4444', 'type' => 'expense'],
+        ['id' => 17, 'label' => 'Internet', 'icon' => 'ic:round-wifi', 'color' => '#3b82f6', 'type' => 'expense'],
+        ['id' => 18, 'label' => 'Pinjaman', 'icon' => 'ic:round-credit-card', 'color' => '#7c3aed', 'type' => 'expense'],
+        ['id' => 19, 'label' => 'Liburan', 'icon' => 'ic:round-flight', 'color' => '#16a34a', 'type' => 'expense'],
+        ['id' => 20, 'label' => 'Jasa', 'icon' => 'ic:round-headphones', 'color' => '#d97706', 'type' => 'expense'],
+        ];
+        @endphp
+
+        @foreach($categories as $category)
+        <div class="category-list-item" data-type="{{ $category['type'] }}">
+            <div class="category-icon-box" style="background-color: {{ $category['color'] }};">
+                <iconify-icon icon="{{ $category['icon'] }}" class="category-icon"></iconify-icon>
+            </div>
+            <div class="category-label">{{ $category['label'] }}</div>
+            <div class="category-actions">
+                <button class="btn-edit" title="Edit">
+                    <iconify-icon icon="ic:round-edit"></iconify-icon>
+                </button>
+                <button class="btn-delete" title="Hapus">
+                    <iconify-icon icon="ic:round-delete"></iconify-icon>
+                </button>
+            </div>
+        </div>
+        @endforeach
+
+        {{-- Tombol Tambah Kategori --}}
+        <div class="category-list-item">
+            <div class="category-icon-box add-category-box">
+                <iconify-icon icon="ic:round-add" class="category-icon"></iconify-icon>
+            </div>
+            <div class="category-label">Tambah</div>
+        </div>
+    </div>
+
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('.tabs-container .nav-link');
+        const categoryItems = document.querySelectorAll('.category-list-item');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                navLinks.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+
+                const filterType = this.getAttribute('data-filter');
+
+                categoryItems.forEach(item => {
+                    const itemType = item.getAttribute('data-type');
+
+                    if (filterType === 'all' || itemType === filterType || itemType === null) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Logika untuk mengganti foto profil
+        const profileImageInput = document.getElementById('profileImageInput');
+        const profileImage = document.getElementById('profileImage');
+
+        profileImageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profileImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
+@endsection
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@extends('layout.app')
+
+@section('head')
+{{-- Memuat pustaka Iconify dari CDN --}}
+<script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+@endsection
+
+@section('content')
+
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    /* Tabs */
+    .tabs-container .nav-link {
+        color: #a0aec0;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-bottom: 2px solid transparent;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .tabs-container .nav-link.active {
+        color: #3b82f6;
+        border-bottom: 2px solid #3b82f6;
+    }
+
+    /* Grid kategori */
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .category-item {
+        text-align: center;
+        position: relative;
+    }
+
+    .category-box {
+        width: 100%;
+        padding-top: 100%;
+        position: relative;
+        border-radius: 1rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease-in-out;
+        cursor: pointer;
+        /* Menambahkan cursor: pointer untuk menunjukkan elemen bisa diklik */
+    }
+
+    .category-box:hover {
+        transform: translateY(-5px);
+    }
+
+    .category-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 2.5rem;
+        color: white;
+    }
+
+    .category-label {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-top: 0.75rem;
+    }
+
+    .category-actions {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        display: flex;
+        gap: 0.5rem;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .category-box:hover .category-actions {
+        opacity: 1;
+    }
+
+    .category-actions button {
+        background: rgba(255, 255, 255, 0.8);
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        color: #4a5568;
+        cursor: pointer;
+    }
+
+    .add-category-box {
+        background-color: #e5e7eb;
+    }
+
+    .add-category-box .category-icon {
+        color: #6b7280;
+    }
+
+    .user-profile-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .user-profile-icon {
+        position: relative;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #fca5a5;
+        cursor: pointer;
+        overflow: hidden;
+    }
+
+    .user-profile-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .tiara-icon {
+        font-size: 1.5rem;
+        color: gold;
+        margin-left: -10px;
+        z-index: 10;
+        transform: rotate(20deg);
+    }
+
+    .hidden-input {
+        display: none;
+    }
+</style>
+
+<div class="container-fluid p-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">Kategori Keuangan</h2>
+        <div class="user-profile d-flex align-items-center gap-2">
+            {{-- Bagian Ikon Profil yang Dapat Diklik --}}
+            <label for="profileImageInput" class="user-profile-icon">
+                <img id="profileImage" src="{{ asset('images/avatar-placeholder.png') }}" alt="User Profile">
+            </label>
+            <input type="file" id="profileImageInput" class="hidden-input" accept="image/*">
+            {{-- Bagian Ikon Tiara --}}
+            <iconify-icon icon="emojione:crown" class="tiara-icon"></iconify-icon>
+        </div>
+    </div>
+
+    {{-- Tabs --}}
+    <div class="tabs-container mb-4">
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link active" data-filter="all">Semua</a></li>
+            <li class="nav-item"><a class="nav-link" data-filter="income">Pemasukan</a></li>
+            <li class="nav-item"><a class="nav-link" data-filter="expense">Pengeluaran</a></li>
+        </ul>
+    </div>
+
+    {{-- Category Grid --}}
+    <div class="category-grid" id="categoryGrid">
+        @php
+        $categories = [
+        // Pemasukan
+        ['id' => 1, 'label' => 'Gaji', 'icon' => 'ic:round-attach-money', 'color' => '#22c55e', 'type' => 'income'],
+        ['id' => 2, 'label' => 'Bonus', 'icon' => 'ic:round-star', 'color' => '#f59e0b', 'type' => 'income'],
+        ['id' => 3, 'label' => 'Hasil Jualan', 'icon' => 'ic:round-local-offer', 'color' => '#facc15', 'type' => 'income'],
+        ['id' => 4, 'label' => 'Freelance', 'icon' => 'ic:round-work', 'color' => '#d97706', 'type' => 'income'],
+        ['id' => 5, 'label' => 'Uang Saku', 'icon' => 'ic:round-monetization-on', 'color' => '#0d9488', 'type' => 'income'],
+        ['id' => 6, 'label' => 'Bunga', 'icon' => 'ic:round-account-balance', 'color' => '#a855f7', 'type' => 'income'],
+        ['id' => 7, 'label' => 'Investasi', 'icon' => 'ic:round-trending-up', 'color' => '#2563eb', 'type' => 'income'],
+
+        // Pengeluaran
+        ['id' => 8, 'label' => 'Kesehatan', 'icon' => 'ic:round-favorite', 'color' => '#ef4444', 'type' => 'expense'],
+        ['id' => 9, 'label' => 'Rumah', 'icon' => 'ic:round-house', 'color' => '#f59e0b', 'type' => 'expense'],
+        ['id' => 10, 'label' => 'Cafe', 'icon' => 'ic:round-local-cafe', 'color' => '#6366f1', 'type' => 'expense'],
+        ['id' => 11, 'label' => 'Pendidikan', 'icon' => 'ic:round-school', 'color' => '#3b82f6', 'type' => 'expense'],
+        ['id' => 12, 'label' => 'Hadiah', 'icon' => 'ic:round-card-giftcard', 'color' => '#db2777', 'type' => 'expense'],
+        ['id' => 13, 'label' => 'Bahan Makanan', 'icon' => 'ic:round-shopping-cart', 'color' => '#16a34a', 'type' => 'expense'],
+        ['id' => 14, 'label' => 'Transportasi', 'icon' => 'ic:round-directions-bus', 'color' => '#6b7280', 'type' => 'expense'],
+        ['id' => 15, 'label' => 'Keluarga', 'icon' => 'ic:round-family-restroom', 'color' => '#6b7280', 'type' => 'expense'],
+        ['id' => 16, 'label' => 'Olahraga', 'icon' => 'ic:round-fitness-center', 'color' => '#ef4444', 'type' => 'expense'],
+        ['id' => 17, 'label' => 'Internet', 'icon' => 'ic:round-wifi', 'color' => '#3b82f6', 'type' => 'expense'],
+        ['id' => 18, 'label' => 'Pinjaman', 'icon' => 'ic:round-credit-card', 'color' => '#7c3aed', 'type' => 'expense'],
+        ['id' => 19, 'label' => 'Liburan', 'icon' => 'ic:round-flight', 'color' => '#16a34a', 'type' => 'expense'],
+        ['id' => 20, 'label' => 'Jasa', 'icon' => 'ic:round-headphones', 'color' => '#d97706', 'type' => 'expense'],
+        ];
+        @endphp
+
+        @foreach($categories as $category)
+        <div class="category-item" data-type="{{ $category['type'] }}">
+            <div class="category-box" style="background-color: {{ $category['color'] }};">
+                <iconify-icon icon="{{ $category['icon'] }}" class="category-icon"></iconify-icon>
+                <div class="category-actions">
+                    <button class="btn-edit" title="Edit">
+                        <iconify-icon icon="ic:round-edit"></iconify-icon>
+                    </button>
+                    <button class="btn-delete" title="Hapus">
+                        <iconify-icon icon="ic:round-delete"></iconify-icon>
+                    </button>
+                </div>
+            </div>
+            <div class="category-label">{{ $category['label'] }}</div>
+        </div>
+        @endforeach
+
+        {{-- Tombol Tambah Kategori, dengan atribut yang memicu modal --}}
+        <div class="category-item" data-bs-toggle="modal" data-bs-target="#tambahKategoriModal" style="cursor: pointer;">
+            <div class="category-box add-category-box">
+                <iconify-icon icon="ic:round-add" class="category-icon"></iconify-icon>
+            </div>
+            <div class="category-label">Tambah</div>
+        </div>
+    </div>
+</div>
+
+{{-- Memanggil file modals/tambah_kategori.blade.php di sini --}}
+@include('kategori.modals.tambah_kategori')
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('.tabs-container .nav-link');
+        const categoryItems = document.querySelectorAll('#categoryGrid .category-item');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                navLinks.forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+
+                const filterType = this.getAttribute('data-filter');
+
+                categoryItems.forEach(item => {
+                    const itemType = item.getAttribute('data-type');
+
+                    if (filterType === 'all' || itemType === filterType || itemType === null) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Logika untuk mengganti foto profil
+        const profileImageInput = document.getElementById('profileImageInput');
+        const profileImage = document.getElementById('profileImage');
+
+        profileImageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    profileImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    });
+</script>
+@endsection

@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+
+class BerandaController extends Controller
+{
+    public function index()
+    {
+        $totalSaldo = 0;
+        $totalPemasukan = 0;
+        $totalPengeluaran = 0;
+        $pemasukanPercentage = 0;
+        $pengeluaranPercentage = 0;
+
+        $lineChartLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $lineChartDatasets = [
+            [
+                'label' => 'Total Keuangan',
+                'data' => [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                'borderColor' => '#3b82f6',
+                'backgroundColor' => 'transparent',
+                'tension' => 0.4
+            ]
+        ];
+
+        return view('beranda.beranda', compact(
+            'totalSaldo',
+            'totalPemasukan',
+            'totalPengeluaran',
+            'pemasukanPercentage',
+            'pengeluaranPercentage',
+            'lineChartLabels',
+            'lineChartDatasets'
+        ));
+    }
+}
