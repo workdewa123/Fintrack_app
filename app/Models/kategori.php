@@ -13,8 +13,7 @@ class kategori extends Model
 
     protected $table = 'kategoris';
     protected $primaryKey = 'id_kategori';
-    protected $fillable = ['id_pengguna', 'nama_kategori', 'jenis', 'ikon', 'warna'];
-
+    protected $fillable = ['id_pengguna', 'nama_kategori', 'tipe'];
     public function pengguna()
     {
         return $this->belongsTo(Pengguna::class, 'id_pengguna', 'id_pengguna');

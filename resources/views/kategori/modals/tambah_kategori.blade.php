@@ -24,7 +24,8 @@
             </div>
 
             <div class="modal-body" style="padding: 0;">
-                <form id="tambahKategoriForm">
+                {{-- PERBAIKAN: Tambahkan Action dan Method --}}
+                <form id="tambahKategoriForm" action="{{ route('kategori.store') }}" method="POST">
                     @csrf
                     <div class="mb-3">
                         <label for="namaKategori" class="form-label" style="font-weight: 600; color: #4A5568; margin-bottom: 0.5rem;">Nama Kategori</label>
@@ -40,7 +41,7 @@
 
                     <div class="mb-4">
                         <label for="tipeKategori" class="form-label" style="font-weight: 600; color: #4A5568; margin-bottom: 0.5rem;">Tipe Kategori</label>
-                        <select class="form-select" id="tipeKategori" name="tipe_kategori" style="
+                        <select class="form-select" id="tipeKategori" name="tipe_kategori" required style="
                             border-radius: 0.75rem;
                             border: 1px solid #D1D5DB;
                             padding: 0.75rem 1rem;
@@ -52,28 +53,29 @@
                             <option value="pengeluaran">Pengeluaran</option>
                         </select>
                     </div>
-                </form>
-            </div>
 
-            <div class="modal-footer" style="border-top: none; padding: 0; margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="
-                    background-color: #E2E8F0;
-                    border: none;
-                    color: #4A5568;
-                    border-radius: 0.75rem;
-                    padding: 0.75rem 1.5rem;
-                    font-weight: 600;
-                    flex: 1;
-                ">Batal</button>
-                <button type="submit" form="tambahKategoriForm" class="btn btn-primary" style="
-                    background-color: #3B82F6;
-                    border: none;
-                    color: #FFFFFF;
-                    border-radius: 0.75rem;
-                    padding: 0.75rem 1.5rem;
-                    font-weight: 600;
-                    flex: 1;
-                ">Simpan</button>
+                    {{-- PERBAIKAN: Pindahkan tombol ke dalam tag form untuk kompatibilitas browser yang lebih baik --}}
+                    <div class="modal-footer" style="border-top: none; padding: 0; margin-top: 2rem; display: flex; justify-content: center; gap: 1rem;">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="
+                            background-color: #E2E8F0;
+                            border: none;
+                            color: #4A5568;
+                            border-radius: 0.75rem;
+                            padding: 0.75rem 1.5rem;
+                            font-weight: 600;
+                            flex: 1;
+                        ">Batal</button>
+                        <button type="submit" class="btn btn-primary" style="
+                            background-color: #3B82F6;
+                            border: none;
+                            color: #FFFFFF;
+                            border-radius: 0.75rem;
+                            padding: 0.75rem 1.5rem;
+                            font-weight: 600;
+                            flex: 1;
+                        ">Simpan</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
