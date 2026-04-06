@@ -1,4 +1,4 @@
-<div class="modal fade" id="editKategoriModal{{ $category->id_kategori }}" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="editKategoriModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -7,22 +7,21 @@
             </div>
 
             <div class="modal-body">
-                {{-- PERBAIKAN UTAMA: Gunakan id_kategori dan tambahkan @method('PUT') --}}
-                <form action="{{ route('kategori.update', $category->id_kategori) }}" method="POST">
+                {{-- ID form harus sesuai dengan yang dipanggil di script kategori.blade.php --}}
+               <form id="editKategoriForm">
                     @csrf
-                    @method('PUT') 
+                    <input type="hidden" name="_method" value="PUT"> <input type="hidden" id="edit_id_kategori">
                     
                     <div class="mb-3">
                         <label class="form-label">Nama Kategori</label>
-                        <input type="text" class="form-control" name="nama_kategori" 
-                            value="{{ $category->nama_kategori }}" required>
+                        <input type="text" class="form-control" name="nama_kategori" id="edit_nama_kategori" required>
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label">Tipe Kategori</label>
-                        <select class="select" name="tipe_kategori">
-                            <option value="pemasukan" {{ $category->tipe == 'MASUK' ? 'selected' : '' }}>Pemasukan</option>
-                            <option value="pengeluaran" {{ $category->tipe == 'KELUAR' ? 'selected' : '' }}>Pengeluaran</option>
+                        <select class="form-select" name="tipe_kategori" id="edit_tipe_kategori">
+                            <option value="pemasukan">Pemasukan</option>
+                            <option value="pengeluaran">Pengeluaran</option>
                         </select>
                     </div>
 

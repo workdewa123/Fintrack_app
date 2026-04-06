@@ -149,12 +149,21 @@
                         <th class="text-end">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="rekeningTableBody">
-                    </tbody>
+                <tbody id="rekeningTableBody"></tbody>
             </table>
             <div id="emptyState" class="text-center py-5" style="display: none;">
                 <p class="text-muted mb-0">Belum ada rekening yang ditemukan.</p>
             </div>
+        </div>
+        
+        <div class="d-flex justify-content-between align-items-center p-3 border-top bg-light">
+            <div id="paginationInfo" class="text-muted small">
+                Menampilkan 0 dari 0 data
+            </div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0" id="paginationLinks">
+                    </ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -168,214 +177,342 @@
 
 @push('scripts')
 <script>
+    let currentPage = 1;
+    let searchQuery = '';
+
     document.addEventListener('DOMContentLoaded', function() {
-        const rekeningTableBody = document.getElementById('rekeningTableBody');
-        const emptyState = document.getElementById('emptyState');
-        const totalSaldoEl = document.getElementById('totalSaldo');
+        loadRekeningData();
+
+        // Fitur Pencarian (Tetap dipertahankan)
         const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                searchQuery = e.target.value;
+                loadRekeningData(1);
+            });
+        }
 
-        // Modal Instances
-        const tambahRekeningModal = new bootstrap.Modal(document.getElementById('tambahRekeningModal'));
-        const editRekeningModal = new bootstrap.Modal(document.getElementById('editRekeningModal'));
-        const hapusRekeningModal = new bootstrap.Modal(document.getElementById('hapusRekeningModal'));
+        // --- PERBAIKAN LOGIKA SIMPAN PERUBAHAN ---
+        const editForm = document.getElementById('editRekeningForm'); // ID sesuai dengan di edit_rekening.blade.php
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault(); 
 
-        let allRekeningData = [];
-        let currentRekeningId = null;
+                const id = document.getElementById('editRekeningId').value;
+                const formData = new FormData(this);
 
-        function loadRekeningFromDatabase() {
-            fetch('/rekening-data')
-                .then(response => response.json())
-                .then(data => {
-                    allRekeningData = data;
-                    renderRekeningTable(data);
+                fetch(`/rekening/${id}`, {
+                    method: 'POST', 
+                    body: formData,
+                    headers: {
+                        // Menggunakan helper Laravel agar lebih aman dari error getAttribute null
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
                 })
-                .catch(err => console.error('Error:', err));
-        }
-
-        function renderRekeningTable(data) {
-            rekeningTableBody.innerHTML = '';
-            let totalSaldo = 0;
-
-            if (data.length === 0) {
-                emptyState.style.display = 'block';
-            } else {
-                emptyState.style.display = 'none';
-                data.forEach(rekening => {
-                    const row = document.createElement('tr');
-                    row.id = `rekening-${rekening.id_rekening}`;
+                .then(response => {
+                    if (!response.ok) throw new Error('Gagal menyimpan data');
+                    return response.json();
+                })
+                .then(data => {
+                    // Tutup modal menggunakan instance Bootstrap
+                    const modalElem = document.getElementById('editRekeningModal');
+                    const modal = bootstrap.Modal.getInstance(modalElem);
+                    if (modal) modal.hide();
                     
-                    const formattedSaldo = new Intl.NumberFormat('id-ID').format(rekening.saldo);
+                    alert('Rekening berhasil diperbarui!');
+                    loadRekeningData(currentPage); // Refresh tabel
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('Terjadi kesalahan saat menyimpan.');
+                });
+            });
+        }
+
+        // --- LOGIKA KLIK IKON & WARNA DI MODAL EDIT ---
+        document.querySelectorAll('#editRekeningModal .icon-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.getElementById('editSelectedIcon').value = this.dataset.icon;
+                document.querySelectorAll('#editRekeningModal .icon-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('#editRekeningModal .color-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.getElementById('editSelectedColor').value = this.dataset.color;
+                document.querySelectorAll('#editRekeningModal .color-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // --- LOGIKA TAMBAH REKENING BARU ---
+        const tambahForm = document.getElementById('tambahRekeningForm');
+        if (tambahForm) {
+            tambahForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Mencegah reload halaman
+
+                const formData = new FormData(this);
+
+                fetch('/rekening', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Gagal menambah rekening');
+                    return response.json();
+                })
+                .then(data => {
+                    // Tutup modal
+                    const modalElem = document.getElementById('tambahRekeningModal');
+                    const modal = bootstrap.Modal.getInstance(modalElem);
+                    if (modal) modal.hide();
+
+                    // Reset Form
+                    tambahForm.reset();
                     
-                    row.innerHTML = `
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="account-icon me-3" style="background-color: ${rekening.warna};">
-                                    <i class="bi ${rekening.icon}"></i>
-                                </div>
-                                <span class="fw-bold text-dark">${rekening.nama_rekening}</span>
-                            </div>
-                        </td>
-                        <td><span class="badge bg-light text-dark border">${rekening.mata_uang}</span></td>
-                        <td><span class="fw-bold">${rekening.mata_uang === 'IDR' ? 'Rp.' : rekening.mata_uang} ${formattedSaldo}</span></td>
-                        <td class="text-end">
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="#" class="action-link edit text-success" 
-                                   data-id="${rekening.id_rekening}"
-                                   data-nama="${rekening.nama_rekening}"
-                                   data-saldo="${rekening.saldo}"
-                                   data-matauang="${rekening.mata_uang}"
-                                   data-icon="${rekening.icon}"
-                                   data-warna="${rekening.warna}">
-                                    <i class="bi bi-pencil-square"></i> Edit
-                                </a>
-                                <a href="#" class="action-link delete text-danger" 
-                                   data-id="${rekening.id_rekening}" 
-                                   data-name="${rekening.nama_rekening}"
-                                   data-bs-toggle="modal" 
-                                   data-bs-target="#hapusRekeningModal">
-                                    <i class="bi bi-trash"></i> Hapus
-                                </a>
-                                <a href="{{ route('riwayat.transfer') }}?rekening_id=${rekening.id_rekening}" class="action-link history text-primary">
-                                    <i class="bi bi-clock-history"></i> Riwayat
-                                </a>
-                            </div>
-                        </td>
-                    `;
-                    rekeningTableBody.appendChild(row);
-                    if (rekening.mata_uang === 'IDR') totalSaldo += parseFloat(rekening.saldo);
-                });
-            }
-            totalSaldoEl.textContent = `Rp. ${new Intl.NumberFormat('id-ID').format(totalSaldo)}`;
-        }
-
-        loadRekeningFromDatabase();
-
-        // Search Logic
-        searchInput.addEventListener('input', function() {
-            const filtered = allRekeningData.filter(r => 
-                r.nama_rekening.toLowerCase().includes(this.value.toLowerCase())
-            );
-            renderRekeningTable(filtered);
-        });
-
-        // Setup Icon & Color Pickers
-        function setupModalPickers(modalId, iconInputId, colorInputId) {
-            const modal = document.getElementById(modalId);
-            const iconItems = modal.querySelectorAll('.icon-item');
-            const colorItems = modal.querySelectorAll('.color-item');
-
-            iconItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    iconItems.forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById(iconInputId).value = this.dataset.icon;
-                });
-            });
-
-            colorItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    colorItems.forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    document.getElementById(colorInputId).value = this.dataset.color;
+                    alert('Rekening baru berhasil ditambahkan!');
+                    loadRekeningData(1); // Refresh tabel ke halaman 1
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('Terjadi kesalahan saat menambah data.');
                 });
             });
         }
 
-        setupModalPickers('tambahRekeningModal', 'selectedIcon', 'selectedColor');
-        setupModalPickers('editRekeningModal', 'editSelectedIcon', 'editSelectedColor');
-
-        // Edit Button Click Logic
-        rekeningTableBody.addEventListener('click', function(e) {
-            const editBtn = e.target.closest('.action-link.edit');
-            if (editBtn) {
-                e.preventDefault();
-                currentRekeningId = editBtn.dataset.id;
-                
-                document.getElementById('editNamaRekening').value = editBtn.dataset.nama;
-                document.getElementById('editSaldoAwal').value = editBtn.dataset.saldo;
-                document.getElementById('editMataUang').value = editBtn.dataset.matauang;
-                document.getElementById('editSelectedIcon').value = editBtn.dataset.icon;
-                document.getElementById('editSelectedColor').value = editBtn.dataset.warna;
-
-                // Sync Active Classes
-                const modal = document.getElementById('editRekeningModal');
-                modal.querySelectorAll('.icon-item').forEach(i => {
-                    i.classList.toggle('active', i.dataset.icon === editBtn.dataset.icon);
-                });
-                modal.querySelectorAll('.color-item').forEach(c => {
-                    c.classList.toggle('active', c.dataset.color === editBtn.dataset.warna);
-                });
-
-                editRekeningModal.show();
-            }
-        });
-
-        // Submit Add
-        document.getElementById('tambahRekeningForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = {
-                nama_rekening: document.getElementById('namaRekening').value,
-                saldo: document.getElementById('saldoAwal').value,
-                mata_uang: document.getElementById('mataUang').value,
-                icon: document.getElementById('selectedIcon').value,
-                warna: document.getElementById('selectedColor').value,
-                _token: '{{ csrf_token() }}'
-            };
-
-            fetch('/rekening', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: JSON.stringify(formData)
-            }).then(() => {
-                tambahRekeningModal.hide();
-                loadRekeningFromDatabase();
-                this.reset();
+        // --- LOGIKA PILIH IKON & WARNA UNTUK TAMBAH REKENING ---
+        // Pastikan ID 'selectedIcon' dan 'selectedColor' sesuai dengan di tambah_rekening.blade.php
+        document.querySelectorAll('#tambahRekeningModal .icon-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.getElementById('selectedIcon').value = this.dataset.icon;
+                document.querySelectorAll('#tambahRekeningModal .icon-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
             });
         });
 
-        // Submit Edit
-        document.getElementById('editRekeningForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const formData = {
-                nama_rekening: document.getElementById('editNamaRekening').value,
-                saldo: document.getElementById('editSaldoAwal').value,
-                mata_uang: document.getElementById('editMataUang').value,
-                icon: document.getElementById('editSelectedIcon').value,
-                warna: document.getElementById('editSelectedColor').value,
-                _token: '{{ csrf_token() }}'
-            };
-
-            fetch(`/rekening/${currentRekeningId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: JSON.stringify(formData)
-            }).then(() => {
-                editRekeningModal.hide();
-                loadRekeningFromDatabase();
+        document.querySelectorAll('#tambahRekeningModal .color-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.getElementById('selectedColor').value = this.dataset.color;
+                document.querySelectorAll('#tambahRekeningModal .color-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
             });
-        });
-
-        // Delete Logic
-        document.getElementById('formHapusRekening').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = document.getElementById('hapusRekeningIdInput').value;
-            
-            fetch(`/rekening/${id}`, {
-                method: 'DELETE',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
-            }).then(() => {
-                hapusRekeningModal.hide();
-                loadRekeningFromDatabase();
-            });
-        });
-
-        // Modal Delete Trigger
-        const modalHapus = document.getElementById('hapusRekeningModal');
-        modalHapus.addEventListener('show.bs.modal', function(e) {
-            const btn = e.relatedTarget;
-            document.getElementById('hapusRekeningIdInput').value = btn.dataset.id;
-            this.querySelector('.modal-body span').textContent = btn.dataset.name;
         });
     });
+
+    // --- FUNGSI LOAD DATA (Tetap dipertahankan) ---
+    function loadRekeningData(page = 1) {
+        currentPage = page;
+        fetch(`/rekening-data?page=${page}&search=${searchQuery}`)
+            .then(response => response.json())
+            .then(data => {
+                renderRekeningTable(data.data);
+                renderPagination(data);
+                if(data.total_semua_rekening) {
+                    document.getElementById('totalSaldo').textContent = data.total_semua_rekening;
+                }
+            })
+            .catch(err => console.error('Error:', err));
+    }
+
+    // --- FUNGSI RENDER TABEL (Tetap dipertahankan) ---
+    function renderRekeningTable(rekenings) {
+        const tbody = document.getElementById('rekeningTableBody');
+        const emptyState = document.getElementById('emptyState');
+        tbody.innerHTML = '';
+
+        if (!rekenings || rekenings.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        rekenings.forEach(rek => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="account-icon me-3" style="background-color: ${rek.warna || '#4a90e2'}">
+                                <i class="bi ${rek.icon || 'bi-wallet2'}"></i>
+                            </div>
+                            <div>
+                                <div class="fw-bold text-dark">${rek.nama_rekening}</div>
+                                <div class="text-muted small">Personal</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${rek.mata_uang || 'IDR'}</td>
+                    <td class="fw-bold text-dark">Rp ${new Intl.NumberFormat('id-ID').format(rek.saldo)}</td>
+                    <td class="text-end">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-sm btn-light border" onclick="editRekening(${rek.id_rekening})">
+                                <i class="bi bi-pencil text-primary"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light border" onclick="deleteRekening(${rek.id_rekening})">
+                                <i class="bi bi-trash text-danger"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    // --- PERBAIKAN FUNGSI EDIT REKENING (PENGISIAN DATA) ---
+    window.editRekening = function(id) {
+        fetch(`/rekening/${id}`)
+            .then(response => {
+                if (!response.ok) throw new Error('Data tidak ditemukan');
+                return response.json();
+            })
+            .then(rek => {
+                // Pastikan ID ini sesuai dengan elemen di edit_rekening.blade.php
+                document.getElementById('editRekeningId').value = rek.id_rekening;
+                document.getElementById('editNamaRekening').value = rek.nama_rekening;
+                document.getElementById('editSaldoAwal').value = rek.saldo;
+                document.getElementById('editMataUang').value = rek.mata_uang;
+                document.getElementById('editSelectedIcon').value = rek.icon;
+                document.getElementById('editSelectedColor').value = rek.warna;
+
+                // Update visual Ikon Aktif
+                document.querySelectorAll('#editRekeningModal .icon-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.icon === rek.icon) item.classList.add('active');
+                });
+
+                // Update visual Warna Aktif
+                document.querySelectorAll('#editRekeningModal .color-item').forEach(item => {
+                    item.classList.remove('active');
+                    if (item.dataset.color === rek.warna) item.classList.add('active');
+                });
+
+                // Tampilkan modal
+                const modalElem = document.getElementById('editRekeningModal');
+                const modal = new bootstrap.Modal(modalElem);
+                modal.show();
+            })
+            .catch(err => alert(err.message));
+    };
+
+    // --- FUNGSI HAPUS REKENING ---
+window.deleteRekening = function(id) {
+    // Set ID ke dalam input hidden yang ada di modal hapus
+    // Pastikan di modal hapus Anda memiliki input: <input type="hidden" id="deleteRekeningId">
+    const deleteInput = document.getElementById('deleteRekeningId');
+    if (deleteInput) {
+        deleteInput.value = id;
+    }
+
+    // Tampilkan modal konfirmasi hapus
+    // Pastikan ID modal di hapus_rekening.blade.php adalah 'hapusRekeningModal'
+    const modalElem = document.getElementById('hapusRekeningModal');
+    if (modalElem) {
+        const hapusModal = new bootstrap.Modal(modalElem);
+        hapusModal.show();
+    } else {
+        // Jika modal tidak ditemukan, gunakan konfirmasi browser biasa sebagai cadangan
+        if (confirm('Apakah Anda yakin ingin menghapus rekening ini?')) {
+            executeDelete(id);
+        }
+    }
+};
+
+// --- 1. FUNGSI UNTUK MEMBUKA MODAL HAPUS ---
+window.deleteRekening = function(id) {
+    fetch(`/rekening/${id}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Data tidak ditemukan');
+            return response.json();
+        })
+        .then(rek => {
+            // Isi ID ke input hidden (ID sesuai modal hapus)
+            const idInput = document.getElementById('deleteRekeningId');
+            const nameSpan = document.getElementById('hapusRekeningNama');
+            
+            if (idInput) idInput.value = rek.id_rekening;
+            if (nameSpan) nameSpan.textContent = rek.nama_rekening;
+
+            // Munculkan Modal
+            const modalElem = document.getElementById('hapusRekeningModal');
+            if (modalElem) {
+                const hapusModal = new bootstrap.Modal(modalElem);
+                hapusModal.show();
+            }
+        })
+        .catch(err => console.error('Gagal memuat data hapus:', err));
+};
+
+// --- 2. FUNGSI UNTUK EKSEKUSI HAPUS KE SERVER ---
+window.executeDelete = function() {
+    const idInput = document.getElementById('deleteRekeningId');
+    if (!idInput || !idInput.value) {
+        alert('ID Rekening tidak ditemukan!');
+        return;
+    }
+
+    const id = idInput.value;
+
+    fetch(`/rekening/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (!response.ok) throw new Error('Gagal menghapus data');
+        return response.json();
+    })
+    .then(data => {
+        // Tutup modal
+        const modalElem = document.getElementById('hapusRekeningModal');
+        const modal = bootstrap.Modal.getInstance(modalElem);
+        if (modal) modal.hide();
+
+        alert('Rekening berhasil dihapus!');
+        loadRekeningData(currentPage); // Refresh tabel otomatis
+    })
+    .catch(err => {
+        console.error('Error:', err);
+        alert('Terjadi kesalahan saat menghapus data.');
+    });
+};
+    // --- FUNGSI PAGINATION (Tetap dipertahankan) ---
+    function renderPagination(data) {
+        const linksContainer = document.getElementById('paginationLinks');
+        const info = document.getElementById('paginationInfo');
+        linksContainer.innerHTML = '';
+        info.textContent = `Menampilkan ${data.from || 0} - ${data.to || 0} dari ${data.total} rekening`;
+
+        if (data.links) {
+            data.links.forEach(link => {
+                const isActive = link.active ? 'active' : '';
+                const isDisabled = !link.url ? 'disabled' : '';
+                const label = link.label.replace('&laquo; Previous', '‹').replace('Next &raquo;', '›');
+                linksContainer.innerHTML += `
+                    <li class="page-item ${isActive} ${isDisabled}">
+                        <a class="page-link" href="#" onclick="changePage(event, '${link.url}')">${label}</a>
+                    </li>
+                `;
+            });
+        }
+    }
+
+    window.changePage = function(e, url) {
+        e.preventDefault();
+        if (url) {
+            fetch(url + `&search=${searchQuery}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderRekeningTable(data.data);
+                    renderPagination(data);
+                });
+        }
+    };
 </script>
 @endpush

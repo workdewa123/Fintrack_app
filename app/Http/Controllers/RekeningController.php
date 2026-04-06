@@ -14,10 +14,14 @@ class RekeningController extends Controller
     }
 
     // FUNGSI API untuk mengambil semua data rekening
-    public function getRekeningData()
+    public function getRekeningData(Request $request)
     {
         $idPengguna = Auth::id();
-        $rekenings = Rekening::where('id_pengguna', $idPengguna)->get();
+        // Mengambil data dengan pagination (5 data per halaman)
+        $rekenings = Rekening::where('id_pengguna', $idPengguna)
+                    ->orderBy('created_at', 'desc')
+                    ->paginate(5); 
+                    
         return response()->json($rekenings);
     }
 

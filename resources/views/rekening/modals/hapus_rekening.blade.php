@@ -30,15 +30,19 @@
                             Batal
                         </button>
 
-                        <form id="formHapusRekening" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <input type="hidden" id="hapusRekeningIdInput" name="id">
-                            <button type="submit" class="btn rounded-pill px-5" id="btnHapusRekening"
-                                style="background:#2f86c6; color:#fff; font-weight:600; font-family:'Inter',sans-serif;">
-                                Hapus
+                        {{-- Ganti bagian form di hapus_rekening.blade.php dengan ini --}}
+                        <div class="d-flex justify-content-center">
+                            <button type="button" class="btn btn-light rounded-pill px-4 me-3" data-bs-dismiss="modal">
+                                Batal
                             </button>
-                        </form>
+
+                            {{-- Gunakan ID deleteRekeningId agar cocok dengan window.executeDelete --}}
+                            <input type="hidden" id="deleteRekeningId"> 
+                            
+                            <button type="button" class="btn btn-danger rounded-pill px-4" onclick="executeDelete()">
+                                Hapus Sekarang
+                            </button>
+                        </div>
                     </div>
 
                 </div>

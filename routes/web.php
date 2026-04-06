@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/rekening', [RekeningController::class, 'index'])->name('rekening.index');
     Route::get('/rekening-data', [RekeningController::class, 'getRekeningData'])->name('rekening.data');
     Route::post('/rekening', [RekeningController::class, 'store'])->name('rekening.store');
-    Route::get('/rekening/{rekening}', [RekeningController::class, 'show'])->name('rekening.show');
+    Route::get('/rekening/{rekening}', [RekeningController::class, 'show'])->name('show');
     Route::put('/rekening/{rekening}', [RekeningController::class, 'update'])->name('rekening.update');
     Route::delete('/rekening/{rekening}', [RekeningController::class, 'destroy'])->name('rekening.destroy');
 
@@ -41,8 +41,10 @@ Route::middleware('auth')->group(function () {
     Route::prefix('kategori')->name('kategori.')->group(function () {
         Route::get('/', [KategoriController::class, 'index'])->name('index');
         Route::post('/store', [KategoriController::class, 'store'])->name('store');
-        Route::put('/update/{id}', [KategoriController::class, 'update'])->name('update');
         Route::delete('/destroy/{id}', [KategoriController::class, 'destroy'])->name('destroy');
+        Route::get('/kategori-data', [KategoriController::class, 'getKategoriData']);
+        Route::get('/show/{id}', [KategoriController::class, 'show']);
+        Route::put('/update/{id}', [KategoriController::class, 'update'])->name('kategori.update');
     });
 
     // --- RANGKAIAN PEMBAYARAN REGULER ---
