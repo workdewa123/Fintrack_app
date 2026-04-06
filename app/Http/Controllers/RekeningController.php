@@ -61,7 +61,8 @@ class RekeningController extends Controller
             'warna' => 'required|string',
         ]);
 
-        $rekening->update($request->all());
+        // Gunakan ini agar _token tidak ikut diupdate ke database
+        $rekening->update($request->only(['nama_rekening', 'saldo', 'mata_uang', 'icon', 'warna']));
 
         return response()->json($rekening);
     }

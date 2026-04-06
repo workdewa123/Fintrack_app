@@ -273,8 +273,8 @@
         function createRekeningItem(data) {
             const newRekeningItem = document.createElement('div');
             newRekeningItem.classList.add('list-group-item', 'd-flex', 'align-items-center', 'justify-content-between');
-            newRekeningItem.setAttribute('data-rekening-id', data.id);
-            newRekeningItem.id = `rekening-${data.id}`;
+            newRekeningItem.setAttribute('data-rekening-id', data.id_rekening);
+            newRekeningItem.id = `rekening-${data.id_rekening}`;
 
             newRekeningItem.innerHTML = `
                 <div class="d-flex align-items-center">
@@ -292,7 +292,7 @@
                     </div>
                     <div class="account-actions d-flex gap-2 align-items-center">
                         <a href="#" class="action-link edit text-success"
-                           data-id="${data.id}"
+                           data-id="${data.id_rekening}"
                            data-nama="${data.nama_rekening}"
                            data-saldo="${data.saldo}"
                            data-matauang="${data.mata_uang}"
@@ -300,10 +300,14 @@
                            data-warna="${data.warna}">
                             <i class="bi bi-pencil-square"></i> <span class="d-none d-md-inline">Edit</span>
                         </a>
-                        <a href="#" class="action-link delete text-danger" data-bs-toggle="modal" data-bs-target="#hapusRekeningModal" data-id="${data.id}" data-name="${data.nama_rekening}">
+                        <a href="#" class="action-link delete text-danger" 
+                        data-bs-toggle="modal" 
+                        data-bs-target="#hapusRekeningModal" 
+                        data-id="${data.id_rekening}" 
+                        data-name="${data.nama_rekening}">
                             <i class="bi bi-trash"></i> <span class="d-none d-md-inline">Hapus</span>
                         </a>
-                        <a href="{{ route('riwayat.transfer') }}?rekening_id=${data.id}" class="action-link history text-primary">
+                        <a href="{{ route('riwayat.transfer') }}?rekening_id=${data.id_rekening}" class="action-link history text-primary">
                             <i class="bi bi-clock-history"></i> <span class="d-none d-md-inline">Lihat Riwayat</span>
                         </a>
                     </div>

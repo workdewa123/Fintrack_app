@@ -10,7 +10,7 @@ class Rekening extends Model
     use HasFactory;
 
     protected $table = 'rekenings';
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'id_rekening';
 
     protected $fillable = [
         'id_pengguna',
