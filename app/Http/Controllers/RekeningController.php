@@ -17,12 +17,29 @@ class RekeningController extends Controller
     public function getRekeningData(Request $request)
     {
         $idPengguna = Auth::id();
-        // Mengambil data dengan pagination (5 data per halaman)
-        $rekenings = Rekening::where('id_pengguna', $idPengguna)
-                    ->orderBy('created_at', 'desc')
-                    ->paginate(5); 
-                    
-        return response()->json($rekenings);
+        
+        // 1. Tangkap input pencarian dari request JavaScript
+        $search = $request->query('search');
+
+        // 2. Hitung total saldo (total saldo biasanya tidak terpengaruh filter pencarian)
+        $totalSaldo = Rekening::where('id_pengguna', $idPengguna)->sum('saldo');
+
+        // 3. Bangun Query untuk data rekening
+        $query = Rekening::where('id_pengguna', $idPengguna);
+
+        // 4. Tambahkan Filter Pencarian jika variabel $search tidak kosong
+        if (!empty($search)) {
+            $query->where('nama_rekening', 'LIKE', '%' . $search . '%');
+        }
+
+        // 5. Eksekusi pagination (tetap 5 data per halaman)
+        $rekenings = $query->orderBy('created_at', 'desc')->paginate(5);
+
+        // 6. Siapkan response JSON
+        $responseData = $rekenings->toArray();
+        $responseData['total_semua_rekening'] = $totalSaldo;
+
+        return response()->json($responseData);
     }
 
     // FUNGSI API untuk menyimpan data rekening baru

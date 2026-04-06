@@ -48,6 +48,12 @@
         height: 300px;
         width: 100%;
     }
+    /* Tambahkan ini di dalam <style> beranda.blade.php */
+    .card-text {
+        font-size: clamp(1.2rem, 3vw, 2rem) !important; /* Font akan mengecil otomatis jika ruang sempit */
+        word-wrap: break-word;
+        line-height: 1.2;
+    }
 </style>
 
 <div class="container-fluid py-4">
@@ -126,6 +132,8 @@
 @include('beranda.tambah_transaksi')
 
 @endsection
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 @push('scripts')
 @include('beranda.beranda_scripts')

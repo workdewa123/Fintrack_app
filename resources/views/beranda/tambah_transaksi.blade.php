@@ -21,7 +21,10 @@
                     </div>
                     <div class="mb-3">
                         <label for="kategori" class="form-label">Kategori</label>
-                        <input type="text" class="form-control" id="kategori" placeholder="Pilih Kategori" required>
+                        <select class="form-select" id="kategori" name="id_kategori" required>
+                            <option disabled selected>Pilih Kategori</option>
+                            {{-- Options akan diisi oleh JavaScript --}}
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="jumlah" class="form-label">Jumlah</label>

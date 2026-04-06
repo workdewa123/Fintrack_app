@@ -37,7 +37,45 @@ class BerandaController extends Controller
 
         return view('beranda.beranda', compact('totalSaldo', 'totalPemasukan', 'totalPengeluaran'));
     }
+    
+public function storeTransaksi(Request $request)
+{
+    try {
+        // 1. Validasi Input
+        $request->validate([
+            'id_rekening' => 'required',
+            'id_kategori' => 'required',
+            'tipe' => 'required|in:MASUK,KELUAR',
+            'jumlah' => 'required|numeric|min:0',
+            'tanggal_transaksi' => 'required',
+        ]);
 
+        // 2. Simpan Transaksi menggunakan Model transaksi
+        $transaksi = transaksi::create([
+            'id_rekening'       => $request->id_rekening,
+            'id_kategori'       => $request->id_kategori,
+            'tipe'              => $request->tipe,
+            'jumlah'            => $request->jumlah,
+            'tanggal_transaksi' => $request->tanggal_transaksi,
+            'keterangan'           => $request->catatan,
+        ]);
+
+        // 3. LOGIKA UPDATE SALDO: Otomatis tambah/kurang saldo di tabel rekening
+        $rekening = Rekening::findOrFail($request->id_rekening);
+        if ($request->tipe == 'MASUK') {
+            $rekening->saldo += $request->jumlah;
+        } else {
+            $rekening->saldo -= $request->jumlah;
+        }
+        $rekening->save();
+
+        return response()->json(['success' => true, 'data' => $transaksi]);
+        
+    } catch (\Exception $e) {
+        // Mengirim pesan error spesifik jika terjadi kegagalan SQL
+        return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+    }
+}
     public function getApiData()
     {
         $id_pengguna = Auth::id();

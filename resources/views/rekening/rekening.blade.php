@@ -305,7 +305,7 @@
         });
     });
 
-    // --- FUNGSI LOAD DATA (Tetap dipertahankan) ---
+    // --- FUNGSI LOAD DATA ---
     function loadRekeningData(page = 1) {
         currentPage = page;
         fetch(`/rekening-data?page=${page}&search=${searchQuery}`)
@@ -313,9 +313,20 @@
             .then(data => {
                 renderRekeningTable(data.data);
                 renderPagination(data);
-                if(data.total_semua_rekening) {
-                    document.getElementById('totalSaldo').textContent = data.total_semua_rekening;
+                
+                // --- BAGIAN YANG DIPERBAIKI ---
+                if(data.total_semua_rekening !== undefined) {
+                    // Gunakan Intl.NumberFormat untuk memformat angka ke Rupiah
+                    const formattedTotal = new Intl.NumberFormat('id-ID', {
+                        style: 'currency',
+                        currency: 'IDR',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(data.total_semua_rekening);
+                    
+                    document.getElementById('totalSaldo').textContent = formattedTotal;
                 }
+                // ------------------------------
             })
             .catch(err => console.error('Error:', err));
     }

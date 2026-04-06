@@ -7,12 +7,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class transaksi extends Model
 {
-    //
     use HasFactory;
 
     protected $table = 'transaksis';
     protected $primaryKey = 'id_transaksi';
-    protected $fillable = ['id_rekening', 'id_kategori', 'jumlah', 'tanggal', 'deskripsi', 'tipe'];
+
+    // PERBAIKAN: Nama kolom harus sama persis dengan database & input form
+    protected $fillable = [
+        'id_rekening', 
+        'id_kategori', 
+        'jumlah', 
+        'tanggal_transaksi', // Sebelumnya 'tanggal'
+        'keterangan',           
+        'tipe'
+    ];
 
     public function rekening()
     {
