@@ -8,13 +8,9 @@ use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\PengingatController;
+use App\Http\Controllers\PengaturanController;
 
-/*
-|--------------------------------------------------------------------------
-| Public Routes (Akses Tanpa Login)
-|--------------------------------------------------------------------------
-*/
-
+// --- PUBLIC ROUTES ---
 Route::get('/', [PenggunaController::class, 'showHalamanAwal'])->name('halaman.awal');
 Route::get('/login', [PenggunaController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [PenggunaController::class, 'authenticate']);
@@ -22,17 +18,16 @@ Route::get('/register', [PenggunaController::class, 'showRegistrationForm'])->na
 Route::post('/register', [PenggunaController::class, 'register']);
 Route::get('/landing-page', [PenggunaController::class, 'showLandingPage'])->name('landing.page');
 
-/*
-|--------------------------------------------------------------------------
-| Protected Routes (Akses Setelah Login)
-|--------------------------------------------------------------------------
-*/
-
+// --- PROTECTED ROUTES ---
 Route::middleware('auth')->group(function () {
+    // Beranda & API Dashboard
     Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda.index');
+    Route::get('/api/beranda-data', [BerandaController::class, 'getApiData']); // <-- Tambahkan ini
+    Route::post('/api/transaksi-simpan', [BerandaController::class, 'storeTransaksi']); // <-- Tambahkan ini
+
     Route::post('/logout', [PenggunaController::class, 'logout'])->name('logout');
 
-    // Rute untuk Rekening
+    // Rekening
     Route::get('/rekening', [RekeningController::class, 'index'])->name('rekening.index');
     Route::get('/rekening-data', [RekeningController::class, 'getRekeningData'])->name('rekening.data');
     Route::post('/rekening', [RekeningController::class, 'store'])->name('rekening.store');
@@ -42,30 +37,37 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/riwayat-transfer', [TransferController::class, 'index'])->name('riwayat.transfer');
 
-// Grouping route untuk kategori agar lebih rapi
-Route::prefix('kategori')->name('kategori.')->group(function () {
-    
-    // Menampilkan halaman daftar kategori (tabel)
-    Route::get('/', [KategoriController::class, 'index'])->name('index');
+    // Kategori
+    Route::prefix('kategori')->name('kategori.')->group(function () {
+        Route::get('/', [KategoriController::class, 'index'])->name('index');
+        Route::post('/store', [KategoriController::class, 'store'])->name('store');
+        Route::put('/update/{id}', [KategoriController::class, 'update'])->name('update');
+        Route::delete('/destroy/{id}', [KategoriController::class, 'destroy'])->name('destroy');
+    });
 
-    // Proses Tambah Kategori (POST)
-    // Sesuai dengan form di tambah_kategori.blade.php
-    Route::post('/store', [KategoriController::class, 'store'])->name('store');
+    // --- RANGKAIAN PEMBAYARAN REGULER ---
+    Route::middleware('auth')->group(function () {
+        Route::prefix('pembayaran-reguler')->group(function () {
+            // Halaman Utama (Daftar)
+            Route::get('/', [PengingatController::class, 'index'])->name('pembayaran.index');
 
-    // Proses Update/Edit Kategori (PUT)
-    // Sesuai dengan @method('PUT') di edit_kategori.blade.php
-    Route::put('/update/{id}', [KategoriController::class, 'update'])->name('update');
+            // Halaman Form Tambah
+            Route::get('/tambah', [PengingatController::class, 'create'])->name('pembayaran.create');
 
-    // Proses Hapus Kategori (DELETE)
-    Route::delete('/destroy/{id}', [KategoriController::class, 'destroy'])->name('destroy');
-});
-    // Rute untuk Pembayaran Reguler
-    Route::get('/pembayaran-reguler', [PengingatController::class, 'showRegularPayments'])->name('pembayaran.reguler');
-
-    // Rute untuk Pengingat
-    Route::get('/pengingat', [PengingatController::class, 'index'])->name('pengingat.index');
-
-    // Resource routes
+            // Aksi Simpan & Hapus
+            Route::post('/simpan', [PengingatController::class, 'store'])->name('pembayaran.store');
+            Route::delete('/{id}', [PengingatController::class, 'destroy'])->name('pembayaran.destroy');
+        });
+    });
+    // Resource
     Route::resource('transaksi', TransaksiController::class);
     Route::resource('transfer', TransferController::class);
+
+    // Pengaturan
+    Route::prefix('pengaturan')->name('pengaturan.')->group(function () {
+        Route::get('/', [PengaturanController::class, 'index'])->name('index');
+        Route::post('/profil', [PengaturanController::class, 'updateProfil'])->name('profil');
+        Route::post('/preferensi', [PengaturanController::class, 'updatePreferensi'])->name('preferensi');
+        Route::post('/pin', [PengaturanController::class, 'updatePin'])->name('pin');
+    });
 });

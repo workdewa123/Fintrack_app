@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Pengaturan;
+use Illuminate\Support\Facades\Auth;
+
+class PengaturanController extends Controller
+{
+    public function index()
+    {
+        // 1. Pastikan User terdeteksi. Kalau null, tendang ke login.
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        $user = Auth::user();
+        $userId = $user->getAuthIdentifier(); // Cara lebih aman mengambil ID
+
+        // 2. Gunakan updateOrCreate supaya lebih stabil
+        // Kita cari berdasarkan user_id, kalau tidak ada baru buat.
+        $pengaturan = Pengaturan::where('user_id', $userId)->first();
+
+        if (!$pengaturan) {
+            $pengaturan = new Pengaturan();
+            $pengaturan->user_id = $userId;
+            $pengaturan->mata_uang = 'IDR-Rupiah';
+            $pengaturan->format_tanggal = 'DD/MM/YYYY';
+            $pengaturan->bahasa = 'Indonesia';
+            $pengaturan->notifikasi_aktif = false;
+            $pengaturan->save();
+        }
+
+        return view('pengaturan.index', [
+            'pengaturan' => $pengaturan,
+            'userExists' => $user
+        ]);
+    }
+
+    public function updateProfil(Request $request)
+    {
+        $request->validate(['nama' => 'required|string|max:255']);
+
+        $user = Auth::user();
+        if ($user) {
+            $user->update(['name' => $request->nama]);
+            return back()->with('success', 'Profil berhasil diperbarui!');
+        }
+        return back()->with('error', 'Gagal memperbarui profil.');
+    }
+
+    public function updatePreferensi(Request $request)
+    {
+        // Cari pengaturan milik user yang sedang login
+        $pengaturan = Pengaturan::where('user_id', Auth::id())->firstOrFail();
+
+        $pengaturan->update([
+            'mata_uang' => $request->mata_uang,
+            'format_tanggal' => $request->format_tanggal,
+            'bahasa' => $request->bahasa ?? 'Indonesia',
+            'notifikasi_aktif' => $request->has('notifikasi_aktif'),
+        ]);
+
+        return back()->with('success', 'Preferensi berhasil disimpan!');
+    }
+}

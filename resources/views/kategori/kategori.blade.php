@@ -92,14 +92,6 @@
             <button class="btn btn-dark px-4 shadow-sm d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#tambahKategoriModal">
                 <iconify-icon icon="ic:round-plus"></iconify-icon> Tambah
             </button>
-
-            <div class="user-profile d-flex align-items-center">
-                <label for="profileImageInput" class="user-profile-icon border">
-                    <img id="profileImage" src="{{ asset('images/avatar-placeholder.png') }}" alt="User Profile">
-                </label>
-                <input type="file" id="profileImageInput" class="hidden-input" accept="image/*">
-                <iconify-icon icon="emojione:crown" class="tiara-icon"></iconify-icon>
-            </div>
         </div>
     </div>
 
