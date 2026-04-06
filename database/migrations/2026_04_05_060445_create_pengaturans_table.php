@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Cek dulu apakah tabel sudah ada untuk menghindari error 1050
         if (!Schema::hasTable('pengaturans')) {
             Schema::create('pengaturans', function (Blueprint $table) {
                 $table->id();
-                // Pastikan tabel 'penggunas' sudah dimigrasi sebelum file ini dijalankan
+                
+                // PERBAIKAN: Menambahkan parameter kedua 'id_pengguna' 
+                // agar Laravel tahu kolom apa yang dijadikan referensi.
                 $table->foreignId('user_id')
-                    ->constrained('penggunas')
+                    ->constrained('penggunas', 'id_pengguna') 
                     ->onDelete('cascade');
+
                 $table->string('mata_uang')->default('IDR-Rupiah');
                 $table->string('format_tanggal')->default('DD/MM/YYYY');
                 $table->string('bahasa')->default('Indonesia');
