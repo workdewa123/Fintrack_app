@@ -64,6 +64,8 @@ Route::middleware('auth')->group(function () {
     // Resource
     Route::resource('transaksi', TransaksiController::class);
     Route::resource('transfer', TransferController::class);
+    // web.php
+Route::get('/laporan/pdf', [TransaksiController::class, 'exportPDF'])->name('laporan.pdf');
 
     // Pengaturan
     Route::prefix('pengaturan')->name('pengaturan.')->group(function () {

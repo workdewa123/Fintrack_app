@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Auth;
 
 class TransaksiController extends Controller
 {
@@ -25,6 +27,25 @@ class TransaksiController extends Controller
 
         $transaksi = Transaksi::create($request->all());
         return response()->json($transaksi);
+    }
+
+    public function exportPDF()
+    {
+        $id_pengguna = Auth::id();
+        
+        // Ambil data transaksi milik user yang sedang login
+        $transaksi = Transaksi::with(['rekening', 'kategori'])
+            ->whereHas('rekening', function ($q) use ($id_pengguna) {
+                $q->where('id_pengguna', $id_pengguna);
+            })
+            ->orderBy('tanggal_transaksi', 'desc')
+            ->get();
+
+        // Load view khusus untuk PDF
+        $pdf = Pdf::loadView('laporan.transaksi_pdf', compact('transaksi'));
+
+        // Unduh file PDF
+        return $pdf->download('laporan-transaksi-' . now()->format('Y-m-d') . '.pdf');
     }
 
     public function show(Transaksi $transaksi)

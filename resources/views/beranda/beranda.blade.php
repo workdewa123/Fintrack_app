@@ -60,19 +60,21 @@
     <div class="row g-4 mb-4">
         <div class="col-md-4">
             <div class="card total-rekening p-4 h-100">
-                <div class="card-body p-0">
-                    <h6 class="text-white-50">Total Saldo Seluruh Rekening</h6>
-                    <h2 class="card-text" id="totalSaldoBeranda">Rp. {{ number_format($totalSaldo, 0, ',', '.') }}</h2>
+                {{-- GANTI BAGIAN DI DALAM <div class="card-body p-0"> PADA TOTAL SALDO --}}
+<h6 class="text-white-50">Total Saldo Seluruh Rekening</h6>
+<h2 class="card-text" id="totalSaldoBeranda">Rp. {{ number_format($totalSaldo, 0, ',', '.') }}</h2>
 
-                    <div class="d-flex gap-2 mt-3">
-                        <a href="{{ route('rekening.index') }}" class="btn btn-sm btn-light-custom rounded-pill px-3">
-                            Lihat Rekening
-                        </a>
-                        <button class="btn btn-sm btn-white bg-white text-primary rounded-pill px-3 fw-bold" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
-                            + Tambah Transaksi Baru
-                        </button>
-                    </div>
-                </div>
+<div class="d-flex flex-wrap gap-2 mt-4">
+    <a href="{{ route('rekening.index') }}" class="btn btn-sm btn-light-custom rounded-pill px-3">
+        Lihat Rekening
+    </a>
+    <a href="{{ route('laporan.pdf') }}" class="btn btn-sm btn-light-custom rounded-pill px-3">
+        <i class="bi bi-file-pdf"></i> Cetak PDF
+    </a>
+    <button class="btn btn-sm btn-white bg-white text-primary rounded-pill px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+        + Tambah Transaksi
+    </button>
+</div>
             </div>
         </div>
 

@@ -180,8 +180,8 @@
                 {{ session('locale') == 'en' ? 'Regular Payment' : 'Pembayaran Reguler' }}
             </a>
 
-            {{-- Pengaturan --}}
-            <a href="{{ url('/pengaturan') }}" class="nav-link {{ request()->is('pengaturan') ? 'active' : '' }}">
+            {{-- Pengaturan {{ url('/pengaturan') }} --}}
+            <a href="#" class="nav-link {{ request()->is('pengaturan') ? 'active' : '' }}">
                 <iconify-icon icon="solar:settings-bold"></iconify-icon>
                 {{ session('locale') == 'en' ? 'Settings' : 'Pengaturan' }}
             </a>
