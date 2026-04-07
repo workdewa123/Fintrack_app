@@ -236,36 +236,32 @@
 </div>
 
 {{-- Fitur Section --}}
-<div class="section-fitur" id="fitur">
-    <div class="container">
-        <div class="section-title" data-aos="fade-up">
-            <h2>Fitur Unggulan FinTrack</h2>
-            <p>Berbagai fitur yang memudahkan Anda dalam mengatur keuangan harian.</p>
+<div class="section-fitur min-vh-100 d-flex align-items-center" id="fitur">
+    <div class="container py-5">
+        <div class="section-title text-center mb-5" data-aos="fade-up">
+            <h2 class="fw-bold">Fitur Unggulan FinTrack</h2>
+            <p class="text-muted">Berbagai fitur yang memudahkan Anda dalam mengatur keuangan harian.</p>
         </div>
-        <div class="row g-4">
-            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
-                <div class="fitur-card">
-                    <i class="fa-solid fa-chart-line fa-3x m3 icon-fitur" style="color: #5862ee;"></i>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="fitur-card text-center p-4 h-100 shadow-sm border-0">
+                    <i class="fa-solid fa-chart-line fa-3x mb-3 icon-fitur" style="color: #5862ee;"></i>
                     <h5 class="fw-bold">Laporan & Riwayat Keuangan</h5>
                     <p>Lihat semua catatan keuangan secara detail, filter berdasarkan tanggal, kategori, atau tipe transaksi.</p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
-                <div class="fitur-card">
-                    <i class="fa-solid fa-right-left fa-3x m3 icon-fitur" style="color: #5862ee;"></i>
-                    <h5 class="fw-bold">Transfer Antar Rekening</h5>
-                    <p>Pindahkan dana antar rekening pribadi dengan cepat dan mudah, lengkap dengan catatan histori.</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
-                <div class="fitur-card">
-                    <i class="fa-regular fa-bell fa-3x m3 icon-fitur" style=" color: #5862ee;"></i>
+
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="fitur-card text-center p-4 h-100 shadow-sm border-0">
+                    <i class="fa-regular fa-bell fa-3x mb-3 icon-fitur" style="color: #5862ee;"></i>
                     <h5 class="fw-bold">Pengingat Pembayaran Reguler</h5>
                     <p>Atur pengingat tagihan berulang agar tidak pernah melewatkan pembayaran penting.</p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3" data-aos="fade-up" data-aos-delay="400">
-                <div class="fitur-card">
+
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="fitur-card text-center p-4 h-100 shadow-sm border-0">
                     <i class="fa-solid fa-tag fa-3x mb-3 icon-fitur" style="color: #5862ee;"></i>
                     <h5 class="fw-bold">Pengelolaan Kategori</h5>
                     <p>Atur kategori pemasukan dan pengeluaran dengan ikon dan warna khusus.</p>
@@ -277,7 +273,7 @@
 
 {{-- Alur Section --}}
 <div class="section-alur" id="alur">
-    <class class="container">
+    <div class="container"> {{-- Perbaikan tag class menjadi div --}}
         <div class="section-title" data-aos="fade-up">
             <h2>Alur Kerja FinTrack yang Sederhana</h2>
             <p>Ikuti langkah mudah untuk mulai mengelola keuangan pribadi Anda.</p>
@@ -304,29 +300,9 @@
                     </div>
                     <span class="ms-3" style="font-size: 7rem; font-weight: bold; color: #FF7B00;">2</span>
                 </div>
-                {{-- Alur 3 --}}
+                {{-- Alur 3 (Sebelumnya Alur 5) --}}
                 <div class="alur-card alur-card-blue" data-aos="fade-right" data-aos-delay="300">
                     <span class="me-3" style="font-size: 7rem; font-weight: bold; color: #1250C3;">3</span>
-                    <div>
-                        <h5 class="fw-bold mb-1">Transfer Antar Rekening</h5>
-                        <p class="text-muted mb-0">Pindahkan dana antar rekening pribadi Anda dengan aman.<br><br>
-                            • Pilih rekening asal dan tujuan<br>
-                            • Masukkan jumlah dan tanggal transfer</p>
-                    </div>
-                </div>
-                {{-- Alur 4 --}}
-                <div class="alur-card alur-card-orange" data-aos="fade-left" data-aos-delay="400">
-                    <div>
-                        <h5 class="fw-bold mb-1">Kelola Kategori & Pengingat</h5>
-                        <p class="text-muted mb-0">Personalisasi pencatatan keuangan Anda.<br><br>
-                            • Tambah, edit, dan hapus kategori keuangan<br>
-                            • Buat pengingat untuk pembayaran rutin
-                    </div>
-                    <span class="ms-3" style="font-size: 7rem; font-weight: bold; color: #FF7B00;">4</span>
-                </div>
-                {{-- Alur 5 --}}
-                <div class="alur-card alur-card-blue" data-aos="fade-right" data-aos-delay="500">
-                    <span class="me-3" style="font-size: 7rem; font-weight: bold; color: #1250C3;">5</span>
                     <div>
                         <h5 class="fw-bold mb-1">Lihat Laporan & Riwayat</h5>
                         <p class="text-muted mb-0">Dapatkan gambaran jelas tentang kondisi keuangan Anda.<br><br>
@@ -336,8 +312,9 @@
                 </div>
             </div>
         </div>
-    </class>
+    </div>
 </div>
+
 {{-- Testimoni Section --}}
 <div class="section-testimoni" id="testimoni">
     <div class="container">

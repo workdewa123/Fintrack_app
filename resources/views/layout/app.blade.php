@@ -175,8 +175,6 @@
                 {{ session('locale') == 'en' ? 'Category' : 'Kategori Keuangan' }}
             </a>
 
-            {{-- PEMBAYARAN REGULER (PENGINGAT SUDAH JADI SATU DI SINI) --}}
-            {{-- Menggunakan wildcard '*' agar tetap active di semua sub-halaman pembayaran --}}
             <a href="{{ route('pembayaran.index') }}" class="nav-link {{ request()->is('pembayaran-reguler*') ? 'active' : '' }}">
                 <iconify-icon icon="hugeicons:transaction"></iconify-icon>
                 {{ session('locale') == 'en' ? 'Regular Payment' : 'Pembayaran Reguler' }}
