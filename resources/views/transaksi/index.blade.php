@@ -2,14 +2,24 @@
 
 @section('content')
 <style>
-    /* Konsistensi Header Cards */
-    .card-stat { border-radius: 1.25rem; border: none; transition: transform 0.2s; min-height: 120px; }
-    .bg-total { background: #4a90e2; color: white; }
-    .bg-masuk { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-    .bg-keluar { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    /* Konsistensi dengan Kategori & Rekening Page */
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8f9fa;
+    }
 
-    /* Filter Underline */
-    .tabs-container .nav { border-bottom: 1px solid #e2e8f0; display: flex; gap: 10px; }
+    .transaksi-header {
+        background-color: #4a90e2;
+        color: white;
+        padding: 2.5rem 2rem;
+        border-radius: 1rem;
+    }
+
+    /* Tabs Styling */
+    .tabs-container .nav {
+        border-bottom: 1px solid #e2e8f0;
+    }
+
     .tabs-container .nav-link {
         color: #64748b;
         font-weight: 600;
@@ -19,60 +29,162 @@
         cursor: pointer;
         text-decoration: none;
     }
+
     .tabs-container .nav-link.active {
         color: #3b82f6;
         border-bottom: 3px solid #3b82f6;
     }
 
-    .table-container { background: white; border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden; }
+    /* Table Styles */
+    .table-container {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .table thead th {
+    background-color: #f1f5f9;
+        color: #64748b;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.025em;
+        padding: 1rem;
+        border: none;
+    }
+    .table thead tr {
+    background-color: #f1f5f9; /* Pindahkan warna background ke baris (tr) */
+}
+
+    .table tbody td {
+        vertical-align: middle;
+        padding: 1.25rem 1rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* Badge Styles */
+    .badge-custom {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+
+    .badge-income {
+        background-color: #e6fffa;
+        color: #047857;
+        border: 1px solid #b2f5ea;
+    }
+
+    .badge-expense {
+        background-color: #fff5f5;
+        color: #c53030;
+        border: 1px solid #feb2b2;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s;
+        border: 1px solid #e2e8f0;
+        background: white;
+    }
+
+    .btn-action:hover {
+        background-color: #f8fafc;
+        transform: translateY(-1px);
+    }
+
+    .btn-primary-custom {
+        background-color: #3b82f6;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        border-radius: 50rem;
+        transition: all 0.2s;
+    }
+
+    .btn-primary-custom:hover {
+        background-color: #2563eb;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Stat Cards Specific */
+    .card-stat-mini {
+        border: none;
+        border-radius: 1rem;
+        background: white;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    /* Update/Tambahkan di bagian <style> index.blade.php */
+    .total-rekening {
+        background-color: #3b82f6;
+        color: white;
+        border-radius: 1.5rem;
+    }
+
+    .total-pemasukan {
+        background-color: #e8f9ef;
+        color: #333;
+        border-radius: 1.5rem;
+    }
+
+    .total-pengeluaran {
+        background-color: #fdeaea;
+        color: #333;
+        border-radius: 1.5rem;
+    }
+
+    .card-text-custom {
+        font-size: clamp(1.2rem, 3vw, 2rem) !important;
+        word-wrap: break-word;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0.5rem 0;
+    }
 </style>
 
 <div class="container-fluid py-4 px-md-4">
-    {{-- Header Section --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold">Riwayat Transaksi</h3>
-            <p class="text-muted small">Kelola dan pantau detail pengeluaran & pemasukan Anda</p>
-        </div>
-        <div class="d-flex gap-2">
-            <a href="{{ route('laporan.pdf') }}" class="btn btn-outline-danger rounded-pill px-4 btn-sm d-flex align-items-center gap-2">
-                <i class="bi bi-file-earmark-pdf-fill"></i> PDF
-            </a>
-            <button class="btn btn-primary rounded-pill px-4 btn-sm" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
-                + Baru
-            </button>
-        </div>
+    <div class="mb-4">
+        <h3 class="fw-bold">Riwayat Transaksi</h3>
+        <p class="text-muted">Kelola dan pantau detail pengeluaran & pemasukan Anda</p>
     </div>
 
-    {{-- Statistik Cards --}}
+    {{-- Header Section (Statistics) - Updated to Match Beranda --}}
     <div class="row g-4 mb-4">
         <div class="col-md-4">
-            <div class="card card-stat bg-total p-3 shadow-sm d-flex justify-content-center">
-                <div class="card-body py-2">
-                    <small class="opacity-75 d-block mb-1">Total Volume</small>
-                    <h3 class="fw-bold mb-0" id="statTotal">Rp 0</h3>
+            <div class="card total-rekening p-4 h-100">
+                <h6 class="text-white-50">Saldo Keseluruhan</h6>
+                <h2 class="card-text-custom text-white" id="statTotal">Rp 0</h2>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card total-pemasukan p-4 h-100">
+                <div class="card-body p-0">
+                    <h6 class="text-muted">Total Pemasukan</h6>
+                    <h2 class="card-text-custom text-success" id="statMasuk">Rp 0</h2>
                 </div>
             </div>
         </div>
+
         <div class="col-md-4">
-            <div class="card card-stat bg-masuk p-3 shadow-sm d-flex justify-content-center">
-                <div class="card-body py-2">
-                    <small class="d-block mb-1">Total Pemasukan</small>
-                    <h3 class="fw-bold mb-0" id="statMasuk">Rp 0</h3>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card card-stat bg-keluar p-3 shadow-sm d-flex justify-content-center">
-                <div class="card-body py-2">
-                    <small class="d-block mb-1">Total Pengeluaran</small>
-                    <h3 class="fw-bold mb-0" id="statKeluar">Rp 0</h3>
+            <div class="card total-pengeluaran p-4 h-100">
+                <div class="card-body p-0">
+                    <h6 class="text-muted">Total Pengeluaran</h6>
+                    <h2 class="card-text-custom text-danger" id="statKeluar">Rp 0</h2>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Filter & Search --}}
+    {{-- Filter & Action Bar --}}
     <div class="row mb-4 align-items-center g-3">
         <div class="col-md-6">
             <div class="tabs-container">
@@ -84,35 +196,54 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="input-group shadow-sm rounded-pill overflow-hidden bg-white">
-                <span class="input-group-text bg-white border-0 ps-3"><i class="bi bi-search"></i></span>
-                <input type="text" id="txSearch" class="form-control border-0 py-2 shadow-none" placeholder="Cari catatan atau kategori...">
+            <div class="d-flex gap-2 justify-content-md-end">
+                <div class="input-group shadow-sm rounded-pill overflow-hidden bg-white border" style="max-width: 300px;">
+                    <span class="input-group-text bg-white border-0 ps-3">
+                        <iconify-icon icon="ic:round-search" class="text-muted"></iconify-icon>
+                    </span>
+                    <input type="text" id="txSearch" class="form-control border-0 py-2 shadow-none" placeholder="Cari transaksi...">
+                </div>
+                <a href="{{ route('laporan.pdf') }}" class="btn btn-outline-danger rounded-pill px-3 d-flex align-items-center gap-2">
+                    <iconify-icon icon="mingcute:pdf-fill"></iconify-icon> PDF
+                </a>
+                <button class="btn btn-primary-custom text-white d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                    <iconify-icon icon="ic:round-plus" style="font-size: 1.25rem;"></iconify-icon> Baru
+                </button>
             </div>
         </div>
     </div>
 
-    {{-- Table --}}
-    <div class="table-container shadow-sm border">
+    {{-- Table Section --}}
+    <div class="table-container shadow-sm">
         <div class="table-responsive">
-            <table class="table mb-0 align-middle">
-                <thead class="bg-light text-secondary">
+            <table class="table mb-0">
+                <thead>
                     <tr>
-                        <th class="ps-4" style="font-size: 0.85rem;">TANGGAL</th>
-                        <th style="font-size: 0.85rem;">KATEGORI</th>
-                        <th style="font-size: 0.85rem;">TIPE</th>
-                        <th style="font-size: 0.85rem;">REKENING</th>
-                        <th style="font-size: 0.85rem;">JUMLAH</th>
-                        <th class="text-end pe-4" style="font-size: 0.85rem;">AKSI</th>
+                        <th class="ps-4">Tanggal</th>
+                        <th>Kategori & Catatan</th>
+                        <th>Rekening</th>
+                        <th>Jumlah</th>
+                        <th class="text-end pe-4">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="txTableBody">
-                    {{-- Data via AJAX --}}
+                    {{-- Diisi oleh JavaScript --}}
                 </tbody>
             </table>
+            <div id="emptyState" class="text-center py-5" style="display: none;">
+                <iconify-icon icon="line-md:coffee-loop" style="font-size: 3rem;" class="text-muted mb-2"></iconify-icon>
+                <p class="text-muted mb-0">Tidak ada transaksi yang ditemukan.</p>
+            </div>
         </div>
+        
+        {{-- Pagination --}}
         <div class="d-flex justify-content-between align-items-center p-4 border-top bg-light">
-            <small id="txPaginationInfo" class="text-muted"></small>
-            <nav><ul class="pagination pagination-sm mb-0" id="txPaginationLinks"></ul></nav>
+            <div id="txPaginationInfo" class="text-muted small fw-medium">
+                Memuat data...
+            </div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0" id="txPaginationLinks"></ul>
+            </nav>
         </div>
     </div>
 </div>
