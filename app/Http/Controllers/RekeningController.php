@@ -94,4 +94,15 @@ class RekeningController extends Controller
         $rekening->delete();
         return response()->json(['message' => 'Rekening berhasil dihapus.']);
     }
+
+    // Tambahkan fungsi ini di RekeningController.php
+    public function allRekening()
+    {
+        $idPengguna = Auth::id();
+        $rekenings = Rekening::where('id_pengguna', $idPengguna)
+                    ->orderBy('nama_rekening', 'asc')
+                    ->get(); // Menggunakan get() bukan paginate() agar semua data keluar
+
+        return response()->json($rekenings);
+    }
 }

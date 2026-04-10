@@ -25,6 +25,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/beranda-data', [BerandaController::class, 'getApiData']); // <-- Tambahkan ini
     Route::post('/api/transaksi-simpan', [BerandaController::class, 'storeTransaksi']); // <-- Tambahkan ini
 
+    // Tambahkan di dalam group middleware auth di web.php
+    Route::get('/api/rekening-all', [RekeningController::class, 'allRekening'])->name('rekening.all');
+    Route::get('/api/kategori-all', [KategoriController::class, 'allKategori'])->name('kategori.all');
+
     Route::post('/logout', [PenggunaController::class, 'logout'])->name('logout');
 
     // Rekening
@@ -65,7 +69,20 @@ Route::middleware('auth')->group(function () {
     Route::resource('transaksi', TransaksiController::class);
     Route::resource('transfer', TransferController::class);
     // web.php
-Route::get('/laporan/pdf', [TransaksiController::class, 'exportPDF'])->name('laporan.pdf');
+// web.php
+Route::middleware('auth')->group(function () {
+    // Rute untuk halaman riwayat transaksi (tampilan)
+    Route::get('/riwayat-transaksi', [TransaksiController::class, 'halamanRiwayat'])->name('transaksi.riwayat');
+    
+    // API Data untuk tabel
+    Route::get('/transaksi-data', [TransaksiController::class, 'getTransaksiData']);
+    
+    // Cetak PDF
+    Route::get('/laporan/pdf', [TransaksiController::class, 'exportPDF'])->name('laporan.pdf');
+
+    // Resource CRUD (sudah ada)
+    Route::resource('transaksi', TransaksiController::class);
+});
 
     // Pengaturan
     Route::prefix('pengaturan')->name('pengaturan.')->group(function () {

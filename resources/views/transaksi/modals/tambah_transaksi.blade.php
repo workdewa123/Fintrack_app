@@ -8,12 +8,16 @@
             </div>
             <div class="modal-body">
                 <form id="addTransactionForm">
+                    {{-- Ganti bagian Jenis Transaksi di tambah_transaksi.blade.php --}}
                     <div class="mb-3">
-                        <label for="jenisTransaksi" class="form-label">Jenis Transaksi</label>
-                        <select class="form-select" id="jenisTransaksi" required>
-                            <option value="pengeluaran">Pengeluaran</option>
-                            <option value="pemasukan">Pemasukan</option>
+                        <label for="jenisTransaksi" class="form-label small fw-bold text-muted">JENIS TRANSAKSI (OTOMATIS)</label>
+                        <select class="form-select bg-light border-0 shadow-none" id="jenisTransaksi" disabled>
+                            <option value="">Pilih Kategori Terlebih Dahulu</option>
+                            <option value="MASUK">Pemasukan</option>
+                            <option value="KELUAR">Pengeluaran</option>
                         </select>
+                        {{-- Input hidden ini yang akan dikirim ke Controller --}}
+                        <input type="hidden" name="tipe" id="jenisTransaksiHidden">
                     </div>
                     <div class="mb-3">
                         <label for="tanggalWaktu" class="form-label">Tanggal dan Waktu</label>

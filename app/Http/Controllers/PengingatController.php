@@ -28,7 +28,7 @@ class PengingatController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_rekening' => 'required|exists:rekenings,id',
+            'id_rekening' => 'required|exists:rekenings,id_rekening',
             'id_kategori' => 'nullable|exists:kategoris,id_kategori',
             'nama_pembayaran' => 'required|string|max:100',
             'frekuensi' => 'required',

@@ -16,9 +16,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+
+
 
     {{-- Script Iconify --}}
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <style>
         /* CSS VARIABEL UNTUK DARK MODE */
@@ -173,6 +178,12 @@
             <a href="{{ url('/kategori') }}" class="nav-link {{ request()->is('kategori') ? 'active' : '' }}">
                 <iconify-icon icon="tabler:category-filled"></iconify-icon>
                 {{ session('locale') == 'en' ? 'Category' : 'Kategori Keuangan' }}
+            </a>
+
+            {{-- Transaksi --}}
+            <a href="{{ route('transaksi.riwayat') }}" class="nav-link {{ request()->is('riwayat-transaksi') ? 'active' : '' }}">
+                <iconify-icon icon="material-symbols:history"></iconify-icon>
+                {{ session('locale') == 'en' ? 'Transaction History' : 'Riwayat Transaksi' }}
             </a>
 
             <a href="{{ route('pembayaran.index') }}" class="nav-link {{ request()->is('pembayaran-reguler*') ? 'active' : '' }}">

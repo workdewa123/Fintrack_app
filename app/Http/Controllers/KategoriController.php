@@ -91,4 +91,15 @@ public function update(Request $request, $id)
 
         return redirect()->back()->with('success', 'Kategori berhasil dihapus!');
     }
+
+    // Tambahkan fungsi ini di KategoriController.php
+    public function allKategori()
+    {
+        $idPengguna = Auth::id();
+        $categories = Kategori::where('id_pengguna', $idPengguna)
+                    ->orderBy('nama_kategori', 'asc')
+                    ->get(); // Menggunakan get() agar semua data keluar
+
+        return response()->json($categories);
+    }
 }
