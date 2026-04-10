@@ -41,7 +41,6 @@ class BerandaController extends Controller
 public function storeTransaksi(Request $request)
 {
     try {
-        // 1. Validasi Input
         $request->validate([
             'id_rekening' => 'required',
             'id_kategori' => 'required',
@@ -50,17 +49,17 @@ public function storeTransaksi(Request $request)
             'tanggal_transaksi' => 'required',
         ]);
 
-        // 2. Simpan Transaksi menggunakan Model transaksi
-        $transaksi = transaksi::create([
+        // Simpan transaksi
+        $transaksi = Transaksi::create([
             'id_rekening'       => $request->id_rekening,
             'id_kategori'       => $request->id_kategori,
-            'tipe'              => $request->tipe,
+            'tipe'              => $request->tipe, 
             'jumlah'            => $request->jumlah,
             'tanggal_transaksi' => $request->tanggal_transaksi,
-            'keterangan'           => $request->catatan,
+            'keterangan'        => $request->catatan,
         ]);
 
-        // 3. LOGIKA UPDATE SALDO: Otomatis tambah/kurang saldo di tabel rekening
+        // UPDATE SALDO REKENING
         $rekening = Rekening::findOrFail($request->id_rekening);
         if ($request->tipe == 'MASUK') {
             $rekening->saldo += $request->jumlah;
@@ -72,7 +71,6 @@ public function storeTransaksi(Request $request)
         return response()->json(['success' => true, 'data' => $transaksi]);
         
     } catch (\Exception $e) {
-        // Mengirim pesan error spesifik jika terjadi kegagalan SQL
         return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
     }
 }

@@ -71,9 +71,6 @@
     <a href="{{ route('laporan.pdf') }}" class="btn btn-sm btn-light-custom rounded-pill px-3">
         <i class="bi bi-file-pdf"></i> Cetak PDF
     </a>
-    <button class="btn btn-sm btn-white bg-white text-primary rounded-pill px-3 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
-        + Tambah Transaksi
-    </button>
 </div>
             </div>
         </div>
@@ -130,8 +127,6 @@
         </div>
     </div>
 </div>
-
-@include('beranda.tambah_transaksi')
 
 @endsection
 
