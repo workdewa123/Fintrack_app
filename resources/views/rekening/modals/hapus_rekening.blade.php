@@ -1,119 +1,118 @@
 {{-- hapus_rekening.blade.php --}}
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Montserrat:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* Custom CSS khusus untuk Modal Hapus */
+    #hapusRekeningModal .modal-content {
+        border-radius: 1.25rem;
+        overflow: hidden;
+        border: none;
+    }
+
+    #hapusRekeningModal .modal-body {
+        padding: 2.5rem 2rem;
+        background-color: #ffffff;
+    }
+
+    /* Icon Peringatan */
+    .delete-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        background-color: #fef2f2;
+        color: #ef4444;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.75rem;
+        margin: 0 auto 1.5rem;
+    }
+
+    #hapusRekeningModal .modal-title-custom {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 1.25rem;
+        color: #111827;
+        margin-bottom: 0.5rem;
+    }
+
+    #hapusRekeningModal .modal-desc {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.95rem;
+        color: #6b7280;
+        line-height: 1.5;
+    }
+
+    /* Highlight Nama Rekening */
+    #hapusRekeningNama {
+        color: #111827;
+        font-weight: 600;
+        background-color: #f3f4f6;
+        padding: 0.1rem 0.4rem;
+        border-radius: 4px;
+    }
+
+    /* Button Styling */
+    .btn-delete-confirm {
+        background-color: #ef4444;
+        border: none;
+        color: white;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        transition: all 0.2s;
+    }
+
+    .btn-delete-confirm:hover {
+        background-color: #dc2626;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-cancel-custom {
+        background-color: #f3f4f6;
+        border: none;
+        color: #4b5563;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        transition: all 0.2s;
+    }
+
+    .btn-cancel-custom:hover {
+        background-color: #e5e7eb;
+        color: #1f2937;
+    }
+</style>
 
 <div class="modal fade" id="hapusRekeningModal" tabindex="-1" aria-labelledby="hapusRekeningModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4 shadow" style="background: transparent;">
-            <div class="modal-body p-0">
-                <div class="p-4 rounded-4" style="background: #eaf6fb; border-radius: 18px;">
+    <div class="modal-dialog modal-dialog-centered modal-sm" style="max-width: 400px;">
+        <div class="modal-content shadow-lg">
+            <div class="modal-body text-center">
 
-                    {{-- Judul --}}
-                    <div class="text-center mb-3">
-                        <h2 class="mb-0" style="font-family: 'Montserrat', sans-serif; font-weight:700; font-size:28px; color:#0b2b3a;">
-                            Hapus Rekening
-                        </h2>
-                    </div>
-
-                    {{-- Box konfirmasi --}}
-                    <div class="d-flex justify-content-center mb-4">
-                        <div style="max-width:680px; width:100%;">
-                            <div style="border:1px solid #111827; border-radius:12px; padding:14px 18px; background:#fff; font-family: 'Inter', sans-serif; font-size:16px; color:#0b2b3a; text-align:left;">
-                                Apakah anda yakin akan menghapus rekening
-                                <span style="color:#e11d48; font-weight:600;">“<span id="hapusRekeningNama">REKENING</span>”</span>?
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Tombol --}}
-                    <div class="d-flex justify-content-center">
-                        <button type="button" class="btn btn-light rounded-pill px-4 me-3" data-bs-dismiss="modal" style="font-family:'Inter',sans-serif;">
-                            Batal
-                        </button>
-
-                        {{-- Ganti bagian form di hapus_rekening.blade.php dengan ini --}}
-                        <div class="d-flex justify-content-center">
-                            <button type="button" class="btn btn-light rounded-pill px-4 me-3" data-bs-dismiss="modal">
-                                Batal
-                            </button>
-
-                            {{-- Gunakan ID deleteRekeningId agar cocok dengan window.executeDelete --}}
-                            <input type="hidden" id="deleteRekeningId"> 
-                            
-                            <button type="button" class="btn btn-danger rounded-pill px-4" onclick="executeDelete()">
-                                Hapus Sekarang
-                            </button>
-                        </div>
-                    </div>
-
+                {{-- Visual Icon Peringatan --}}
+                <div class="delete-icon-wrapper">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
                 </div>
+
+                {{-- Judul & Deskripsi --}}
+                <h2 class="modal-title-custom">Hapus Rekening?</h2>
+                <p class="modal-desc">
+                    Apakah Anda yakin ingin menghapus rekening <span id="hapusRekeningNama">REKENING</span>? Tindakan ini tidak dapat dibatalkan.
+                </p>
+
+                {{-- Group Tombol --}}
+                <div class="d-grid gap-2 mt-4">
+                    <input type="hidden" id="deleteRekeningId">
+                    <button type="button" class="btn btn-delete-confirm" onclick="executeDelete()">
+                        Ya, Hapus Sekarang
+                    </button>
+                    <button type="button" class="btn btn-cancel-custom" data-bs-dismiss="modal">
+                        Batal
+                    </button>
+                </div>
+
             </div>
         </div>
     </div>
 </div>
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var hapusModalEl = document.getElementById('hapusRekeningModal');
-        if (!hapusModalEl) return;
-
-        // Saat modal dibuka
-        hapusModalEl.addEventListener('show.bs.modal', function(event) {
-            var trigger = event.relatedTarget;
-            if (!trigger) return;
-
-            var rekeningId = trigger.getAttribute('data-id') || '';
-            var rekeningName = trigger.getAttribute('data-name') || 'Rekening';
-
-            // isi form
-            document.getElementById('hapusRekeningIdInput').value = rekeningId;
-            document.getElementById('hapusRekeningNama').textContent = rekeningName;
-
-            // set action form
-            document.getElementById('formHapusRekening').action = '/rekening/' + encodeURIComponent(rekeningId);
-        });
-
-        // handle submit
-        const form = document.getElementById('formHapusRekening');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const btn = document.getElementById('btnHapusRekening');
-            btn.disabled = true;
-            btn.textContent = 'Menghapus...';
-
-            fetch(form.action, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(res => {
-                    if (!res.ok) throw new Error('Gagal menghapus');
-                    return res.json();
-                })
-                .then(data => {
-                    // ✅ TUTUP MODAL DENGAN CARA YANG BENAR
-                    const modal = bootstrap.Modal.getInstance(hapusModalEl) || new bootstrap.Modal(hapusModalEl);
-                    modal.hide();
-
-                    // Hapus baris rekening dari tabel (opsional)
-                    if (data.id) {
-                        const row = document.getElementById('row-rekening-' + data.id);
-                        if (row) row.remove();
-                    }
-
-                    alert(data.message || 'Rekening berhasil dihapus.');
-                })
-                .catch(err => {
-                    alert('Terjadi kesalahan saat menghapus rekening: ' + err.message);
-                })
-                .finally(() => {
-                    btn.disabled = false;
-                    btn.textContent = 'Hapus';
-                });
-        });
-    });
-</script>
-@endpush

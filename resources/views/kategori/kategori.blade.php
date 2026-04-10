@@ -13,7 +13,7 @@
     }
 
     .kategori-header {
-        background-color: #4a90e2; /* Biru yang sama dengan Rekening */
+        background-color: #4a90e2;
         color: white;
         padding: 2.5rem 2rem;
         border-radius: 1rem;
@@ -38,7 +38,7 @@
         border-bottom: 3px solid #3b82f6;
     }
 
-    /* Table Styles - Disamakan dengan Rekening */
+    /* Table Styles */
     .table-container {
         background: white;
         border-radius: 1rem;
@@ -113,6 +113,53 @@
         background-color: #2563eb;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
+
+    /* MODAL HAPUS CUSTOM STYLING */
+    .modal-confirm {
+        color: #636363;
+        width: 400px;
+    }
+
+    .modal-confirm .modal-content {
+        padding: 20px;
+        border-radius: 20px;
+        border: none;
+        text-align: center;
+    }
+
+    .modal-confirm .icon-box {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 15px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fee2e2;
+        color: #ef4444;
+        font-size: 46px;
+    }
+
+    .modal-confirm .btn-secondary {
+        background: #e2e8f0;
+        color: #64748b;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+    }
+
+    .modal-confirm .btn-danger {
+        background: #ef4444;
+        border: none;
+        border-radius: 12px;
+        padding: 10px 20px;
+        font-weight: 600;
+    }
+
+    .modal-confirm .btn-danger:hover {
+        background: #dc2626;
+    }
 </style>
 
 <div class="container-fluid py-4 px-md-4">
@@ -167,7 +214,7 @@
                 <p class="text-muted mb-0">Tidak ada kategori yang ditemukan.</p>
             </div>
         </div>
-        
+
         {{-- Pagination --}}
         <div class="d-flex justify-content-between align-items-center p-4 border-top bg-light">
             <div id="paginationInfo" class="text-muted small fw-medium">
@@ -180,9 +227,34 @@
     </div>
 </div>
 
-{{-- Modal --}}
+{{-- Modal Tambah & Edit --}}
 @include('kategori.modals.tambah_kategori')
 @include('kategori.modals.edit_kategori')
+
+{{-- Modal Konfirmasi Hapus Custom --}}
+<div id="confirmDeleteModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-confirm modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 justify-content-center">
+                <div class="icon-box">
+                    <iconify-icon icon="line-md:alert-circle-loop"></iconify-icon>
+                </div>
+            </div>
+            <div class="modal-body p-0">
+                <h4 class="fw-bold">Apakah Anda yakin?</h4>
+                <p class="text-muted px-3">Data kategori yang dihapus tidak dapat dikembalikan. Ini mungkin mempengaruhi histori transaksi Anda.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center gap-2">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
+                <form id="deleteKategoriForm" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger px-4">Ya, Hapus!</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 @push('scripts')
 <script>
@@ -195,7 +267,7 @@
         const filterTabs = document.querySelectorAll('.tabs-container .nav-link');
         filterTabs.forEach(tab => {
             tab.addEventListener('click', function(e) {
-                e.preventDefault(); 
+                e.preventDefault();
                 filterTabs.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 currentFilter = this.getAttribute('data-type') || 'semua';
@@ -212,25 +284,25 @@
                 const formData = new FormData(this);
 
                 fetch(`/kategori/update/${id}`, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(res => {
-                    if (!res.ok) throw new Error('Gagal memperbarui data');
-                    return res.json();
-                })
-                .then(data => {
-                    const modalElem = document.getElementById('editKategoriModal');
-                    const modal = bootstrap.Modal.getInstance(modalElem);
-                    if (modal) modal.hide();
-                    alert('Kategori berhasil diperbarui!');
-                    loadKategoriData(currentPage); 
-                })
-                .catch(err => alert('Terjadi kesalahan saat menyimpan'));
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Gagal memperbarui data');
+                        return res.json();
+                    })
+                    .then(data => {
+                        const modalElem = document.getElementById('editKategoriModal');
+                        const modal = bootstrap.Modal.getInstance(modalElem);
+                        if (modal) modal.hide();
+                        alert('Kategori berhasil diperbarui!');
+                        loadKategoriData(currentPage);
+                    })
+                    .catch(err => alert('Terjadi kesalahan saat menyimpan'));
             });
         }
     });
@@ -240,7 +312,6 @@
         fetch(`/kategori/kategori-data?page=${page}&tipe=${currentFilter}`)
             .then(response => response.json())
             .then(data => {
-                // Update counter di header card
                 document.getElementById('totalKategoriCount').textContent = data.total;
                 renderKategoriTable(data.data);
                 renderPagination(data);
@@ -267,7 +338,7 @@
             const badgeClass = isMasuk ? 'badge-income' : 'badge-expense';
             const tipeText = isMasuk ? 'Pemasukan' : 'Pengeluaran';
             const iconType = isMasuk ? 'ic:round-trending-up' : 'ic:round-trending-down';
-            
+
             tbody.innerHTML += `
                 <tr>
                     <td class="ps-4">
@@ -289,13 +360,9 @@
                             <button class="btn-action" title="Edit" onclick="editKategori(${kat.id_kategori})">
                                 <iconify-icon icon="ic:round-edit" class="text-primary"></iconify-icon>
                             </button>
-                            <form action="/kategori/destroy/${kat.id_kategori}" method="POST" onsubmit="return confirm('Hapus kategori ini?')" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn-action" title="Hapus">
-                                    <iconify-icon icon="ic:round-delete" class="text-danger"></iconify-icon>
-                                </button>
-                            </form>
+                            <button type="button" class="btn-action" title="Hapus" onclick="confirmDelete(${kat.id_kategori})">
+                                <iconify-icon icon="ic:round-delete" class="text-danger"></iconify-icon>
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -314,8 +381,7 @@
                 const isActive = link.active ? 'active' : '';
                 const isDisabled = !link.url ? 'disabled' : '';
                 const label = link.label.replace('&laquo; Previous', '‹').replace('Next &raquo;', '›');
-                
-                // Extract page number from URL for consistency with changePage function
+
                 let pageNum = null;
                 if (link.url) {
                     const urlObj = new URL(link.url, window.location.origin);
@@ -336,20 +402,47 @@
         if (page && page !== currentPage) loadKategoriData(page);
     };
 
+    /**
+     * FUNGSI KONFIRMASI HAPUS (MODAL KUSTOM)
+     */
+    window.confirmDelete = function(id) {
+        const form = document.getElementById('deleteKategoriForm');
+        // Set action form sesuai dengan endpoint Anda
+        form.action = `/kategori/destroy/${id}`;
+
+        const modalElem = document.getElementById('confirmDeleteModal');
+        const modal = new bootstrap.Modal(modalElem);
+        modal.show();
+    };
+
     window.editKategori = function(id) {
         fetch(`/kategori/show/${id}`)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error('Data tidak ditemukan di server');
+                return res.json();
+            })
             .then(kat => {
                 document.getElementById('edit_id_kategori').value = kat.id_kategori;
                 document.getElementById('edit_nama_kategori').value = kat.nama_kategori;
-                const tipeValue = kat.tipe === 'MASUK' ? 'pemasukan' : 'pengeluaran';
-                document.getElementById('edit_tipe_kategori').value = tipeValue;
+
+                if (kat.tipe === 'MASUK') {
+                    if (document.getElementById('edit_typeMasuk')) {
+                        document.getElementById('edit_typeMasuk').checked = true;
+                    }
+                } else {
+                    if (document.getElementById('edit_typeKeluar')) {
+                        document.getElementById('edit_typeKeluar').checked = true;
+                    }
+                }
 
                 const modalElem = document.getElementById('editKategoriModal');
                 const modal = new bootstrap.Modal(modalElem);
                 modal.show();
             })
-            .catch(err => alert('Data tidak ditemukan'));
+            .catch(err => {
+                console.error('Fetch error:', err);
+                alert(err.message);
+            });
     };
 </script>
 @endpush

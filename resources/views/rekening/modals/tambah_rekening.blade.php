@@ -1,7 +1,97 @@
 <div class="modal fade" id="tambahRekeningModal" tabindex="-1" aria-labelledby="tambahRekeningModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 shadow">
-            <div class="modal-header border-bottom-0">
+        <div class="modal-content rounded-4 shadow border-0" style="background-color: #f8fafc;">
+            <style>
+                #tambahRekeningModal .modal-header {
+                    border-bottom: none;
+                    padding-top: 1.5rem;
+                    padding-left: 1.5rem;
+                }
+
+                #tambahRekeningModal .modal-title {
+                    color: #1e293b;
+                    font-size: 1.25rem;
+                }
+
+                #tambahRekeningModal .form-label {
+                    font-weight: 600;
+                    color: #475569;
+                    font-size: 0.9rem;
+                }
+
+                /* Warna input diubah agar senada dengan background modal */
+                #tambahRekeningModal .form-control,
+                #tambahRekeningModal .form-select {
+                    border-radius: 0.75rem;
+                    border: 1px solid #e2e8f0;
+                    padding: 0.7rem 1rem;
+                    background-color: #f1f5f9;
+                    /* Warna abu-abu kebiruan lembut */
+                    color: #1e293b;
+                    transition: all 0.2s;
+                }
+
+                /* Saat input diklik/fokus, warnanya sedikit lebih terang */
+                #tambahRekeningModal .form-control:focus,
+                #tambahRekeningModal .form-select:focus {
+                    border-color: #3b82f6;
+                    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+                    background-color: #ffffff;
+                }
+
+                #tambahRekeningModal .icon-item {
+                    width: 45px;
+                    height: 45px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 12px;
+                    border: 2px solid #e2e8f0;
+                    background-color: #ffffff;
+                    color: #94a3b8;
+                    font-size: 1.25rem;
+                    transition: all 0.2s ease;
+                }
+
+                #tambahRekeningModal .icon-item.active {
+                    background-color: #eff6ff;
+                    border-color: #3b82f6;
+                    color: #3b82f6;
+                }
+
+                #tambahRekeningModal .color-item {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    border: 3px solid #ffffff;
+                    box-shadow: 0 0 0 1px #e2e8f0;
+                    transition: all 0.2s ease;
+                }
+
+                #tambahRekeningModal .color-item.active {
+                    box-shadow: 0 0 0 2px #3b82f6;
+                    transform: scale(1.1);
+                }
+
+                #tambahRekeningModal .btn-primary {
+                    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                    border: none;
+                    border-radius: 0.75rem;
+                    padding: 0.75rem;
+                    font-weight: 700;
+                }
+
+                #tambahRekeningModal .btn-light {
+                    background-color: #e2e8f0;
+                    border: none;
+                    border-radius: 0.75rem;
+                    padding: 0.75rem;
+                    color: #475569;
+                    font-weight: 600;
+                }
+            </style>
+
+            <div class="modal-header">
                 <h5 class="modal-title fw-bold" id="tambahRekeningModalLabel">Tambah Rekening</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -19,8 +109,6 @@
                         <label for="saldoAwal" class="form-label">Saldo Awal</label>
                         <input type="number" class="form-control" id="saldoAwal" name="saldo" value="0" min="0" required>
                     </div>
-
-                    {{-- PERBAIKAN: MENAMBAHKAN FIELD MATA UANG --}}
                     <div class="mb-3">
                         <label for="mataUang" class="form-label">Mata Uang</label>
                         <select class="form-select" id="mataUang" name="mata_uang" required>
