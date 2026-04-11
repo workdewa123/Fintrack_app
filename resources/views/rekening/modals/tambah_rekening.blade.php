@@ -18,20 +18,15 @@
                     color: #475569;
                     font-size: 0.9rem;
                 }
-
-                /* Warna input diubah agar senada dengan background modal */
                 #tambahRekeningModal .form-control,
                 #tambahRekeningModal .form-select {
                     border-radius: 0.75rem;
                     border: 1px solid #e2e8f0;
                     padding: 0.7rem 1rem;
                     background-color: #f1f5f9;
-                    /* Warna abu-abu kebiruan lembut */
                     color: #1e293b;
                     transition: all 0.2s;
                 }
-
-                /* Saat input diklik/fokus, warnanya sedikit lebih terang */
                 #tambahRekeningModal .form-control:focus,
                 #tambahRekeningModal .form-select:focus {
                     border-color: #3b82f6;

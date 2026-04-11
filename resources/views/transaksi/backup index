@@ -2,6 +2,7 @@
 
 @section('content')
 <style>
+    /* Konsistensi dengan Kategori & Rekening Page */
     body {
         font-family: 'Inter', sans-serif;
         background-color: #f8f9fa;
@@ -34,6 +35,7 @@
         border-bottom: 3px solid #3b82f6;
     }
 
+    /* Table Styles */
     .table-container {
         background: white;
         border-radius: 1rem;
@@ -61,12 +63,14 @@
         border-bottom: 1px solid #f1f5f9;
     }
 
+    /* Modifikasi khusus kolom Aksi agar lebih ke kanan */
     .col-aksi {
         width: 120px !important;
         text-align: right !important;
         padding-right: 1.5rem !important;
     }
 
+    /* Badge Styles */
     .badge-custom {
         padding: 0.5rem 1rem;
         border-radius: 0.5rem;
@@ -74,7 +78,7 @@
         font-size: 0.8rem;
     }
 
-
+    /* Action Buttons */
     .btn-action {
         width: 32px;
         height: 32px;
@@ -232,58 +236,12 @@
 </div>
 
 @include('transaksi.modals.tambah_transaksi')
-<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
-        <div class="modal-content border-0 shadow" style="border-radius: 1.5rem;">
-            <div class="modal-body text-center p-4">
-                <div class="mb-4 d-flex justify-content-center">
-                    <div style="background-color: #ffe5e5; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <iconify-icon icon="mingcute:alert-line" style="font-size: 3rem; color: #ff4d4d;"></iconify-icon>
-                    </div>
-                </div>
-                <h4 class="fw-bold mb-3">Apakah Anda yakin?</h4>
-                <p class="text-muted mb-4">Data kategori yang dihapus tidak dapat dikembalikan. Ini mungkin mempengaruhi histori transaksi Anda.</p>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-light w-100 py-3 fw-bold" data-bs-dismiss="modal" style="border-radius: 1rem; color: #64748b; background-color: #f1f5f9;">Batal</button>
-                    <button type="button" id="confirmDeleteBtn" class="btn btn-danger w-100 py-3 fw-bold" style="border-radius: 1rem; background-color: #f84c4c;">Ya, Hapus!</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Success Modal --}}
-<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
-        <div class="modal-content border-0 shadow" style="border-radius: 1.5rem;">
-            <div class="modal-body text-center p-4">
-                <div class="mb-4 d-flex justify-content-center">
-                    <div style="background-color: #e8f9ef; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <iconify-icon icon="line-md:confirm-circle" style="font-size: 3rem; color: #2ecc71;"></iconify-icon>
-                    </div>
-                </div>
-                <h4 class="fw-bold mb-3" id="successModalTitle">Berhasil!</h4>
-                <p class="text-muted mb-4" id="successModalMessage">Data transaksi Anda telah diperbarui.</p>
-                <button type="button" class="btn btn-primary-custom w-100 py-3 fw-bold text-white" data-bs-dismiss="modal" style="border-radius: 1rem;">Oke, Mengerti</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 @include('transaksi.modals.edit_transaksi')
 
 @endsection
 
 @push('scripts')
 <script>
-    // Fungsi untuk menampilkan modal sukses
-    function showSuccessModal(title, message) {
-        document.getElementById('successModalTitle').innerText = title;
-        document.getElementById('successModalMessage').innerText = message;
-        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-        successModal.show();
-    }
-
     let currentTipe = 'semua';
     let searchQuery = '';
     let currentPage = 1;
@@ -335,16 +293,18 @@
                 <td class="fw-bold ${item.tipe === 'MASUK' ? 'text-success' : 'text-danger'}">
                     ${item.tipe === 'MASUK' ? '+' : '-'} ${formatter.format(item.jumlah)}
                 </td>
-                <td class="col-aksi">
-                    <div class="d-flex justify-content-end gap-1">
-                        <button class="btn btn-sm btn-light border rounded-pill" onclick="editTransaksi(${item.id_transaksi})">
-                            <i class="bi bi-pencil text-primary"></i>
-                        </button>
-                        <button class="btn btn-sm btn-light border rounded-pill text-danger" onclick="hapusTransaksi(${item.id_transaksi})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </div>
-                </td>
+
+<td class="col-aksi">
+    <div class="d-flex justify-content-end gap-1">
+        <button class="btn btn-sm btn-light border rounded-pill" onclick="editTransaksi(${item.id_transaksi})">
+            <i class="bi bi-pencil text-primary"></i>
+        </button>
+        <button class="btn btn-sm btn-light border rounded-pill text-danger" onclick="hapusTransaksi(${item.id_transaksi})">
+            <i class="bi bi-trash"></i>
+        </button>
+    </div>
+</td>
+
             </tr>
         `).join('');
     }
@@ -372,7 +332,20 @@
             });
     };
 
-    // Logic for Edit Form Submission
+    const editKategoriSelect = document.getElementById('editKategori');
+    if (editKategoriSelect) {
+        editKategoriSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const tipe = selectedOption.getAttribute('data-tipe');
+            const jenisVisual = document.getElementById('editJenisTransaksi');
+            const jenisHidden = document.getElementById('editJenisTransaksiHidden');
+            if (tipe) {
+                jenisVisual.value = tipe;
+                jenisHidden.value = tipe;
+            }
+        });
+    }
+
     const editForm = document.getElementById('editTransactionForm');
     if (editForm) {
         editForm.addEventListener('submit', function(e) {
@@ -384,7 +357,8 @@
                 tipe: document.getElementById('editJenisTransaksiHidden').value,
                 jumlah: document.getElementById('editJumlah').value,
                 tanggal_transaksi: document.getElementById('editTanggalWaktu').value,
-                catatan: document.getElementById('editCatatan').value,
+                keterangan: document.getElementById('editCatatan').value,
+                _method: 'PUT'
             };
 
             fetch(`/transaksi/${id}`, {
@@ -394,18 +368,14 @@
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
                         'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        ...formData,
-                        _method: 'PUT'
-                    })
+                    body: JSON.stringify(formData)
                 })
                 .then(res => res.json())
                 .then(data => {
                     bootstrap.Modal.getInstance(document.getElementById('editTransactionModal')).hide();
-                    showSuccessModal('Berhasil!', 'Transaksi Anda telah berhasil diperbarui.');
+                    alert('Transaksi berhasil diperbarui!');
                     loadTx(currentPage);
-                })
-                .catch(err => console.error(err));
+                });
         });
     }
 
@@ -477,7 +447,6 @@
             });
         }
 
-        // Logic for Add Form Submission
         const addForm = document.getElementById('addTransactionForm');
         if (addForm) {
             addForm.addEventListener('submit', function(e) {
@@ -506,7 +475,7 @@
                             const modalElem = document.getElementById('addTransactionModal');
                             bootstrap.Modal.getInstance(modalElem).hide();
                             addForm.reset();
-                            showSuccessModal('Berhasil!', 'Transaksi baru telah ditambahkan ke riwayat.');
+                            alert('Transaksi berhasil disimpan!');
                             loadTx(1);
                         } else {
                             alert('Gagal: ' + data.error);
@@ -547,42 +516,33 @@
             });
     }
 
-    let transactionIdToDelete = null;
-
     window.hapusTransaksi = function(id) {
-        transactionIdToDelete = id;
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-        deleteModal.show();
-    };
-
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-        if (!transactionIdToDelete) return;
-
-        fetch(`/transaksi/${transactionIdToDelete}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    _method: 'DELETE'
+        if (confirm('Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.')) {
+            fetch(`/transaksi/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        _method: 'DELETE' // Larave menggunakan spoofing method untuk DELETE
+                    })
                 })
-            })
-            .then(res => res.json())
-            .then(data => {
-                const modalElem = document.getElementById('deleteConfirmModal');
-                bootstrap.Modal.getInstance(modalElem).hide();
-
-                if (data.success || data.message) {
-                    loadTx(currentPage);
-                } else {
-                    alert('Gagal menghapus transaksi: ' + (data.error || 'Terjadi kesalahan'));
-                }
-            })
-            .catch(err => {
-                console.error("Error deleting data:", err);
-            });
-    });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success || data.message) {
+                        alert('Transaksi berhasil dihapus!');
+                        loadTx(currentPage); // Memuat ulang tabel agar data sinkron
+                    } else {
+                        alert('Gagal menghapus transaksi: ' + (data.error || 'Terjadi kesalahan'));
+                    }
+                })
+                .catch(err => {
+                    console.error("Error deleting data:", err);
+                    alert('Terjadi kesalahan saat menghubungi server.');
+                });
+        }
+    };
 </script>
 @endpush

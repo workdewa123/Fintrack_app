@@ -76,6 +76,7 @@ Route::middleware('auth')->group(function () {
     
     // API Data untuk tabel
     Route::get('/transaksi-data', [TransaksiController::class, 'getTransaksiData']);
+        Route::delete('/transaksi/{id}', [TransaksiController::class, 'destroy']);
     
     // Cetak PDF
     Route::get('/laporan/pdf', [TransaksiController::class, 'exportPDF'])->name('laporan.pdf');

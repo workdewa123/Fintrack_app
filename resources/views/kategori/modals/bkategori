@@ -261,8 +261,8 @@
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content rounded-4 border-0 shadow" style="border-radius: 1.5rem !important;">
             <div class="modal-body text-center p-4">
-                <div class="modal-success-icon mb-3" id="iconContainer" style="width: 60px; height: 60px; background-color: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 1.75rem;">
-                    <iconify-icon id="modalIcon" icon="line-md:confirm-circle-twotone"></iconify-icon>
+                <div class="modal-success-icon mb-3" style="width: 60px; height: 60px; background-color: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 1.75rem;">
+                    <iconify-icon icon="line-md:confirm-circle-twotone"></iconify-icon>
                 </div>
                 <h5 class="fw-bold mb-2" id="successTitle">Berhasil!</h5>
                 <p class="text-muted mb-4" id="successMessage">Data telah disimpan.</p>
@@ -277,26 +277,10 @@
 
 @push('scripts')
 <script>
-    // Fungsi Global untuk Modal Sukses/Gagal
-    function showSuccessModal(title, message, isError = false) {
-        const titleElem = document.getElementById('successTitle');
-        const messageElem = document.getElementById('successMessage');
-        const iconContainer = document.getElementById('iconContainer');
-        const modalIcon = document.getElementById('modalIcon');
-
-        titleElem.textContent = title;
-        messageElem.textContent = message;
-
-        if (isError) {
-            iconContainer.style.backgroundColor = '#fef2f2';
-            iconContainer.style.color = '#ef4444';
-            modalIcon.setAttribute('icon', 'line-md:close-circle-twotone');
-        } else {
-            iconContainer.style.backgroundColor = '#ecfdf5';
-            iconContainer.style.color = '#10b981';
-            modalIcon.setAttribute('icon', 'line-md:confirm-circle-twotone');
-        }
-
+    // Fungsi Global untuk Modal Sukses
+    function showSuccessModal(title, message) {
+        document.getElementById('successTitle').textContent = title;
+        document.getElementById('successMessage').textContent = message;
         const successModalElem = document.getElementById('successModal');
         const successModal = new bootstrap.Modal(successModalElem);
         successModal.show();
@@ -334,34 +318,20 @@
                             'Accept': 'application/json'
                         }
                     })
-                    .then(async res => {
-                        const contentType = res.headers.get("content-type");
-                        if (contentType && contentType.indexOf("application/json") !== -1) {
-                            return res.json().then(data => ({
-                                status: res.status,
-                                body: data
-                            }));
-                        } else {
-                            return {
-                                status: res.status,
-                                body: {
-                                    message: "Server error atau session habis (Terdeteksi HTML)"
-                                }
-                            };
-                        }
-                    })
                     .then(res => {
-                        if (res.status !== 200 && res.status !== 201) throw new Error(res.body.message || 'Gagal menambah kategori');
-
+                        if (!res.ok) throw new Error('Gagal menambah kategori');
+                        return res.json();
+                    })
+                    .then(data => {
                         const modalElem = document.getElementById('tambahKategoriModal');
                         const modal = bootstrap.Modal.getInstance(modalElem);
                         if (modal) modal.hide();
 
                         tambahForm.reset();
-                        showSuccessModal('Berhasil!', 'Kategori telah tersimpan.');
+                        showSuccessModal('Berhasil!', 'Kategori baru telah ditambahkan.');
                         loadKategoriData(1);
                     })
-                    .catch(err => showSuccessModal('Gagal!', err.message, true));
+                    .catch(err => showSuccessModal('Gagal!', err.message));
             });
         }
 
@@ -381,33 +351,19 @@
                             'Accept': 'application/json'
                         }
                     })
-                    .then(async res => {
-                        const contentType = res.headers.get("content-type");
-                        if (contentType && contentType.indexOf("application/json") !== -1) {
-                            return res.json().then(data => ({
-                                status: res.status,
-                                body: data
-                            }));
-                        } else {
-                            return {
-                                status: res.status,
-                                body: {
-                                    message: "Gagal memperbarui (Respon bukan JSON)"
-                                }
-                            };
-                        }
-                    })
                     .then(res => {
-                        if (res.status !== 200) throw new Error(res.body.message || 'Gagal memperbarui data');
-
+                        if (!res.ok) throw new Error('Gagal memperbarui data');
+                        return res.json();
+                    })
+                    .then(data => {
                         const modalElem = document.getElementById('editKategoriModal');
                         const modal = bootstrap.Modal.getInstance(modalElem);
                         if (modal) modal.hide();
 
-                        showSuccessModal('Berhasil!', 'Kategori telah diedit.');
+                        showSuccessModal('Berhasil!', 'Kategori telah berhasil diperbarui.');
                         loadKategoriData(currentPage);
                     })
-                    .catch(err => showSuccessModal('Gagal!', err.message, true));
+                    .catch(err => showSuccessModal('Gagal!', err.message));
             });
         }
     });

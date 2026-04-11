@@ -1,7 +1,97 @@
 <div class="modal fade" id="editRekeningModal" tabindex="-1" aria-labelledby="editRekeningModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content rounded-4 shadow">
-            <div class="modal-header border-bottom-0">
+        <div class="modal-content rounded-4 shadow border-0" style="background-color: #f8fafc;">
+            <style>
+                #editRekeningModal .modal-header {
+                    border-bottom: none;
+                    padding-top: 1.5rem;
+                    padding-left: 1.5rem;
+                }
+
+                #editRekeningModal .modal-title {
+                    color: #1e293b;
+                    font-size: 1.25rem;
+                }
+
+                #editRekeningModal .form-label {
+                    font-weight: 600;
+                    color: #475569;
+                    font-size: 0.9rem;
+                }
+
+                #editRekeningModal .form-control,
+                #editRekeningModal .form-select {
+                    border-radius: 0.75rem;
+                    border: 1px solid #e2e8f0;
+                    padding: 0.7rem 1rem;
+                    background-color: #f1f5f9;
+                    color: #1e293b;
+                    transition: all 0.2s;
+                }
+
+                #editRekeningModal .form-control:focus,
+                #editRekeningModal .form-select:focus {
+                    border-color: #3b82f6;
+                    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+                    background-color: #ffffff;
+                }
+
+                #editRekeningModal .icon-item {
+                    width: 45px;
+                    height: 45px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 12px;
+                    border: 2px solid #e2e8f0;
+                    background-color: #ffffff;
+                    color: #94a3b8;
+                    font-size: 1.25rem;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+
+                #editRekeningModal .icon-item.active {
+                    background-color: #eff6ff;
+                    border-color: #3b82f6;
+                    color: #3b82f6;
+                }
+
+                /* Styling untuk Warna */
+                #editRekeningModal .color-item {
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    border: 3px solid #ffffff;
+                    box-shadow: 0 0 0 1px #e2e8f0;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                }
+
+                #editRekeningModal .color-item.active {
+                    box-shadow: 0 0 0 2px #3b82f6;
+                    transform: scale(1.1);
+                }
+
+                #editRekeningModal .btn-primary {
+                    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                    border: none;
+                    border-radius: 0.75rem;
+                    padding: 0.75rem;
+                    font-weight: 700;
+                }
+
+                #editRekeningModal .btn-light {
+                    background-color: #e2e8f0;
+                    border: none;
+                    border-radius: 0.75rem;
+                    padding: 0.75rem;
+                    color: #475569;
+                    font-weight: 600;
+                }
+            </style>
+
+            <div class="modal-header">
                 <h5 class="modal-title fw-bold" id="editRekeningModalLabel">Edit Rekening</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
