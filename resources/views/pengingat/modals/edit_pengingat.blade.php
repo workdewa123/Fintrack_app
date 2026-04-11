@@ -23,12 +23,13 @@
                             </div>
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Frekuensi Pengingat</label>
-                                <select name="frekuensi" id="editFrekuensi" class="form-select">
+                                <select name="frekuensi" id="editFrekuensi" class="form-select" onchange="toggleDetailJadwal(this.value, 'containerDetailEdit')">
                                     <option value="HARIAN">Harian</option>
                                     <option value="MINGGUAN">Mingguan</option>
                                     <option value="BULANAN">Bulanan</option>
                                 </select>
                             </div>
+                            <div id="containerDetailEdit" class="mt-3"></div>
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Jumlah Pembayaran (Rp)</label>
                                 <input type="number" name="jumlah" id="editJumlah" class="form-control" required>
