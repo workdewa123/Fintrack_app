@@ -171,7 +171,6 @@
                 <thead>
                     <tr>
                         <th class="ps-4">Nama Pembayaran</th>
-                        <th>Tipe</th>
                         <th>Frekuensi</th>
                         <th>Jumlah</th>
                         <th class="text-end pe-4">Aksi</th>
@@ -260,7 +259,6 @@
         body.innerHTML = items.map(item => `
             <tr>
                 <td class="ps-4 fw-bold text-dark">${item.nama_pembayaran}</td>
-                <td><span class="badge-custom badge-expense">${item.tipe}</span></td>
                 <td><span class="text-muted"><i class="bi bi-clock-history me-1"></i> ${item.frekuensi}</span></td>
                 <td class="fw-bold text-danger">${formatter.format(item.jumlah)}</td>
                 <td class="text-end pe-4">
