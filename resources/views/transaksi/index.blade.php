@@ -43,8 +43,12 @@
         overflow: hidden;
     }
 
+    .table thead tr {
+        background-color: #f1f5f9;
+    }
+
     .table thead th {
-    background-color: #f1f5f9;
+        background-color: #f1f5f9;
         color: #64748b;
         text-transform: uppercase;
         font-size: 0.75rem;
@@ -52,9 +56,7 @@
         padding: 1rem;
         border: none;
     }
-    .table thead tr {
-    background-color: #f1f5f9; /* Pindahkan warna background ke baris (tr) */
-}
+
 
     .table tbody td {
         vertical-align: middle;
@@ -221,9 +223,10 @@
                     <tr>
                         <th class="ps-4">Tanggal</th>
                         <th>Kategori & Catatan</th>
+                        <th>Tipe</th>
                         <th>Rekening</th>
                         <th>Jumlah</th>
-                        <th class="text-end pe-4">Aksi</th>
+                        <th class="text-end ">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="txTableBody">
@@ -312,7 +315,7 @@
                     ${item.tipe === 'MASUK' ? '+' : '-'} ${formatter.format(item.jumlah)}
                 </td>
                 <td class="text-end pe-4">
-                    <div class="d-flex justify-content-end gap-1">
+                    <div class="d-flex justify-content-end gap-">
                         <button class="btn btn-sm btn-light border rounded-pill me-1" onclick="editTransaksi(${item.id_transaksi})">
                             <i class="bi bi-pencil text-primary"></i>
                         </button>
