@@ -48,7 +48,6 @@ class RekeningController extends Controller
         $request->validate([
             'nama_rekening' => 'required|string|max:100',
             'saldo' => 'numeric|min:0',
-            'mata_uang' => 'required|string',
             'icon' => 'required|string',
             'warna' => 'required|string',
         ]);
@@ -57,7 +56,6 @@ class RekeningController extends Controller
             'id_pengguna' => Auth::id(),
             'nama_rekening' => $request->nama_rekening,
             'saldo' => $request->saldo,
-            'mata_uang' => $request->mata_uang,
             'icon' => $request->icon,
             'warna' => $request->warna,
         ]);
@@ -77,13 +75,12 @@ class RekeningController extends Controller
         $request->validate([
             'nama_rekening' => 'required|string|max:100',
             'saldo' => 'numeric|min:0',
-            'mata_uang' => 'required|string',
             'icon' => 'required|string',
             'warna' => 'required|string',
         ]);
 
         // Gunakan ini agar _token tidak ikut diupdate ke database
-        $rekening->update($request->only(['nama_rekening', 'saldo', 'mata_uang', 'icon', 'warna']));
+        $rekening->update($request->only(['nama_rekening', 'saldo', 'icon', 'warna']));
 
         return response()->json($rekening);
     }

@@ -16,7 +16,6 @@ class Rekening extends Model
         'id_pengguna',
         'nama_rekening',
         'saldo',
-        'mata_uang',
         'warna',
         'icon' // GANTI DARI 'ikon' MENJADI 'icon'
     ];

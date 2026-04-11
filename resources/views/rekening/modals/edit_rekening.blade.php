@@ -23,15 +23,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="editMataUang" class="form-label">Mata Uang</label>
-                        <select class="form-select" id="editMataUang" name="mata_uang" required>
-                            <option value="IDR">IDR - Rupiah</option>
-                            <option value="USD">USD - US Dollar</option>
-                            <option value="EUR">EUR - Euro</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
                         <label class="form-label">Pilih Ikon</label>
                         <div class="d-flex flex-wrap gap-2 icon-grid">
                             <div class="icon-item" data-icon="bi-wallet2"><i class="bi bi-wallet2"></i></div>
