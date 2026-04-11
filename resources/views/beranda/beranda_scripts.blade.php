@@ -182,26 +182,76 @@
         fetchDashboardData();
         loadRekeningToModal();
 
-        // --- 5. LOAD KATEGORI KE DROPDOWN MODAL ---
-function loadKategoriToModal() {
-    // Sesuaikan URL ini dengan route getKategoriData di web.php
-    fetch('/kategori/kategori-data') 
-        .then(res => res.json())
-        .then(response => {
-            const select = document.getElementById('kategori');
-            if (select) {
-                select.innerHTML = '<option disabled selected>Pilih Kategori</option>';
-                // Mengambil data dari response.data karena menggunakan pagination
-                const dataKategori = response.data || response; 
-                dataKategori.forEach(k => {
-                    select.innerHTML += `<option value="${k.id_kategori}">${k.nama_kategori} (${k.tipe})</option>`;
-                });
-            }
-        })
-        .catch(err => console.error("Gagal memuat kategori:", err));
-}
+        function bayarTagihan(id) {
+        if (confirm('Konfirmasi pembayaran tagihan ini? Saldo rekening akan otomatis terpotong.')) {
+            fetch(`/pengingat/konfirmasi-bayar/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload(); // Refresh untuk update saldo di dashboard
+                } else {
+                    alert('Terjadi kesalahan.');
+                }
+            });
+        }
+    }
 
-// Panggil fungsinya di bagian bawah script
-loadKategoriToModal();
-    });
+        // --- 5. LOAD KATEGORI KE DROPDOWN MODAL ---
+    function loadKategoriToModal() {
+        // Sesuaikan URL ini dengan route getKategoriData di web.php
+        fetch('/kategori/kategori-data') 
+            .then(res => res.json())
+            .then(response => {
+                const select = document.getElementById('kategori');
+                if (select) {
+                    select.innerHTML = '<option disabled selected>Pilih Kategori</option>';
+                    // Mengambil data dari response.data karena menggunakan pagination
+                    const dataKategori = response.data || response; 
+                    dataKategori.forEach(k => {
+                        select.innerHTML += `<option value="${k.id_kategori}">${k.nama_kategori} (${k.tipe})</option>`;
+                    });
+                }
+            })
+            .catch(err => console.error("Gagal memuat kategori:", err));
+    }
+
+    // Panggil fungsinya di bagian bawah script
+    loadKategoriToModal();
+
+    window.bayarTagihan = function(id) {
+        if (confirm('Konfirmasi pembayaran tagihan ini? Saldo rekening akan otomatis terpotong.')) {
+            fetch(`/pengingat/konfirmasi-bayar/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    // Gunakan fungsi yang sudah ada untuk refresh angka tanpa reload total
+                    fetchDashboardData(); 
+                    // Atau gunakan location.reload() jika ingin refresh total
+                    location.reload(); 
+                } else {
+                    alert('Gagal: ' + data.message);
+                }
+            })
+            .catch(err => {
+                console.error("Error:", err);
+                alert('Terjadi kesalahan koneksi.');
+            });
+        }
+    };
+        });
 </script>

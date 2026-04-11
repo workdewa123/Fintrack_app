@@ -51,6 +51,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/update/{id}', [KategoriController::class, 'update'])->name('kategori.update');
     });
 
+    Route::post('/pengingat/konfirmasi-bayar/{id}', [PengingatController::class, 'konfirmasiBayar'])->name('pengingat.bayar');
+
+
     // --- RANGKAIAN PEMBAYARAN REGULER ---
     Route::middleware('auth')->group(function () {
         Route::prefix('pembayaran-reguler')->group(function () {
@@ -63,6 +66,14 @@ Route::middleware('auth')->group(function () {
             // Aksi Simpan & Hapus
             Route::post('/simpan', [PengingatController::class, 'store'])->name('pembayaran.store');
             Route::delete('/{id}', [PengingatController::class, 'destroy'])->name('pembayaran.destroy');
+
+            Route::get('/data', [PengingatController::class, 'getPengingatData'])->name('pembayaran.data.api');
+
+            // Route untuk mengambil detail data (Show)
+            Route::get('/{id}', [PengingatController::class, 'show'])->name('pembayaran.show');
+
+            // Route untuk memproses update data
+            Route::put('/{id}', [PengingatController::class, 'update'])->name('pembayaran.update');
         });
     });
     // Resource

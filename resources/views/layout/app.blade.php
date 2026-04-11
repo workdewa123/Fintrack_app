@@ -24,6 +24,10 @@
     {{-- Script Iconify --}}
     <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        {{-- Script JS --}}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
     <style>
         /* CSS VARIABEL UNTUK DARK MODE */
@@ -211,9 +215,14 @@
     <div class="main-content">
         <div class="topbar">
             {{-- Notifikasi --}}
-            <div class="top-icon-container" style="position: relative; font-size: 20px; cursor: pointer;">
+            <div class="top-icon-container" 
+                style="position: relative; font-size: 20px; cursor: pointer;" 
+                data-bs-toggle="modal" 
+                data-bs-target="#notifikasiModal">
                 <iconify-icon icon="solar:bell-bold"></iconify-icon>
-                <span class="notification-dot"></span>
+                @if(isset($tagihanGlobal) && $tagihanGlobal->count() > 0)
+                    <span class="notification-dot"></span>
+                @endif
             </div>
 
             {{-- User Profil --}}
@@ -241,11 +250,75 @@
         </main>
     </div>
 
-    {{-- Script JS --}}
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     @stack('scripts')
 </body>
 
 </html>
+
+<script>
+    window.bayarTagihanGlobal = function(id) {
+        if (confirm('Konfirmasi pembayaran tagihan ini? Saldo rekening akan otomatis terpotong.')) {
+            fetch(`/pengingat/konfirmasi-bayar/${id}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload(); 
+                } else {
+                    alert('Gagal: ' + data.message);
+                }
+            })
+            .catch(err => console.error("Error:", err));
+        }
+    };
+
+    window.showDetailModal = function(id) {
+        // 1. Ambil instance modal notifikasi yang sedang terbuka
+        const notifModalElem = document.getElementById('notifikasiModal');
+        const notifModal = bootstrap.Modal.getInstance(notifModalElem);
+        
+        // 2. Tutup modal notifikasi terlebih dahulu
+        if (notifModal) {
+            notifModal.hide();
+        }
+
+        fetch(`/pembayaran-reguler/${id}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Data tidak ditemukan (404)');
+                return res.json();
+            })
+            .then(data => {
+                // Mapping data ke elemen modal detail
+                document.getElementById('detNama').innerText = data.nama_pembayaran;
+                document.getElementById('detJumlah').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(data.jumlah);
+                document.getElementById('detFrekuensi').innerText = data.frekuensi;
+                document.getElementById('detKategori').innerText = data.kategori ? data.kategori.nama_kategori : '-';
+                document.getElementById('detRekening').innerText = data.rekening ? data.rekening.nama_rekening : '-';
+                document.getElementById('detTglMulai').innerText = data.tanggal_mulai;
+                document.getElementById('detTglAkhir').innerText = data.tanggal_akhir || '-';
+                document.getElementById('detKomentar').innerText = data.komentar || '-';
+
+                // 3. Tampilkan Modal Detail setelah fetch berhasil
+                const modalElem = document.getElementById('detailPengingatModal');
+                const modal = new bootstrap.Modal(modalElem);
+                modal.show();
+            })
+            .catch(err => {
+                console.error("Gagal memuat detail:", err);
+                alert("Terjadi kesalahan: " + err.message);
+                
+                // Jika gagal, buka kembali modal notifikasi agar user tidak bingung
+                if (notifModal) notifModal.show();
+            });
+    };
+</script>
+@include('pengingat.modals.notifikasi')
+@include('pengingat.modals.detail_pengingat')
