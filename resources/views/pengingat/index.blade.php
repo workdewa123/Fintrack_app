@@ -41,6 +41,7 @@
     }
 
     .table thead th {
+        background-color: #f1f5f9;
         color: #64748b;
         text-transform: uppercase;
         font-size: 0.75rem;
@@ -48,6 +49,7 @@
         padding: 1rem;
         border: none;
     }
+
 
     .table tbody td {
         vertical-align: middle;
