@@ -26,7 +26,7 @@ class Pengingat extends Model
 
     public function rekening()
     {
-        return $this->belongsTo(Rekening::class, 'id_rekening', 'id');
+        return $this->belongsTo(Rekening::class, 'id_rekening', 'id_rekening');
     }
 
     public function kategori()

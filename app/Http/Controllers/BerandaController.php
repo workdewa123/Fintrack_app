@@ -35,7 +35,14 @@ class BerandaController extends Controller
             ->whereYear('tanggal_transaksi', $tahun)
             ->sum('jumlah');
 
-        return view('beranda.beranda', compact('totalSaldo', 'totalPemasukan', 'totalPengeluaran'));
+        // Ambil pengingat yang aktif untuk user ini
+        $tagihanMendatang = \App\Models\Pengingat::whereHas('rekening', function ($q) use ($id_pengguna) {
+                $q->where('id_pengguna', $id_pengguna);
+            })
+            ->whereMonth('tanggal_mulai', '<=', $bulan)
+            ->get();
+
+        return view('beranda.beranda', compact('totalSaldo', 'totalPemasukan', 'totalPengeluaran', 'tagihanMendatang'));
     }
     
 public function storeTransaksi(Request $request)
