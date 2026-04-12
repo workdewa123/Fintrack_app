@@ -145,10 +145,14 @@ class PengingatController extends Controller
                 'tipe' => 'KELUAR'
             ]);
 
-            // 2. Potong Saldo Rekening
+            // potong saldo rekening
             $rekening = \App\Models\Rekening::find($pengingat->id_rekening);
             $rekening->saldo -= $pengingat->jumlah;
             $rekening->save();
+
+            // 3. Update Tanggal Bayar Terakhir pada Pengingat (TAMBAHKAN INI)
+            $pengingat->tanggal_bayar_terakhir = now()->toDateString();
+            $pengingat->save();
 
             \Illuminate\Support\Facades\DB::commit();
             return response()->json(['success' => true, 'message' => 'Pembayaran berhasil dikonfirmasi!']);
