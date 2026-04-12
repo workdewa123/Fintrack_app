@@ -22,7 +22,8 @@ class Pengingat extends Model
         'tanggal_akhir',
         'jumlah',
         'komentar',
-        'tipe' // Tambahkan tipe untuk membedakan Pemasukan/Pengeluaran
+        'tipe', // Tambahkan tipe untuk membedakan Pemasukan/Pengeluaran
+        'tanggal_bayar_terakhir'
     ];
 
     public function rekening()

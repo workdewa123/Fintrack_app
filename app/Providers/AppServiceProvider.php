@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Pengingat;
+use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,18 +14,31 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Membagikan data tagihan mendatang ke view layout.app secara global
-        View::composer('layout.app', function ($view) {
-            if (Auth::check()) {
-                $bulan = now()->month;
-                $tagihanGlobal = Pengingat::whereHas('rekening', function ($q) {
-                        $q->where('id_pengguna', Auth::id());
-                    })
-                    ->whereMonth('tanggal_mulai', '<=', $bulan)
-                    ->get();
-                
-                $view->with('tagihanGlobal', $tagihanGlobal);
-            }
+        View::composer('*', function ($view) {
+            // Ambil semua pengingat, lalu filter menggunakan PHP (Collection)
+            $tagihanGlobal = Pengingat::all()->filter(function ($item) {
+                // Jika belum pernah dibayar sama sekali, tampilkan!
+                if (is_null($item->tanggal_bayar_terakhir)) {
+                    return true;
+                }
+
+                $terakhirBayar = Carbon::parse($item->tanggal_bayar_terakhir);
+
+                // Cek berdasarkan frekuensi
+                if ($item->frekuensi === 'HARIAN') {
+                    return !$terakhirBayar->isToday(); // Muncul jika belum bayar hari ini
+                }
+                if ($item->frekuensi === 'MINGGUAN') {
+                    return !$terakhirBayar->isCurrentWeek(); // Muncul jika belum bayar minggu ini
+                }
+                if ($item->frekuensi === 'BULANAN') {
+                    return !$terakhirBayar->isCurrentMonth(); // Muncul jika belum bayar bulan ini
+                }
+
+                return true;
+            });
+
+            $view->with('tagihanGlobal', $tagihanGlobal);
         });
     }
 }
