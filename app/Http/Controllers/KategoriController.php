@@ -8,25 +8,23 @@ use Illuminate\Support\Facades\Auth;
 
 class KategoriController extends Controller
 {
-    // Halaman utama - Sekarang tanpa mengirim variabel $categories
     public function index()
     {
         return view('kategori.kategori');
     }
 
-    // Fungsi API untuk mengambil data JSON
     public function getKategoriData(Request $request)
     {
-        $idPengguna = auth()->id();
+        $idPengguna = Auth::id();
         $tipe = $request->query('tipe');
 
         $query = Kategori::where('id_pengguna', $idPengguna);
 
-        // Filter berdasarkan tipe (MASUK/KELUAR)
         if ($tipe && $tipe !== 'semua') {
             $query->where('tipe', $tipe);
         }
 
+        // Paginate tetap 5 sesuai kode awal Anda
         $categories = $query->orderBy('nama_kategori', 'asc')->paginate(5);
 
         return response()->json($categories);
@@ -39,66 +37,81 @@ class KategoriController extends Controller
             'tipe_kategori' => 'required|in:pemasukan,pengeluaran',
         ]);
 
-        Kategori::create([
+        $kategori = Kategori::create([
             'id_pengguna'   => Auth::id(),
             'nama_kategori' => $request->nama_kategori,
             'tipe'          => $request->tipe_kategori == 'pemasukan' ? 'MASUK' : 'KELUAR',
         ]);
 
+        // Jika pakai AJAX, gunakan respon JSON ini:
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Kategori berhasil ditambahkan!',
+                'data' => $kategori
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Kategori berhasil ditambahkan!');
     }
 
-    // Tambahkan fungsi baru ini di KategoriController
-public function show($id)
-{
-    $kategori = Kategori::where('id_pengguna', Auth::id())
-                        ->where('id_kategori', $id)
-                        ->firstOrFail();
-    return response()->json($kategori);
-}
+    public function show($id)
+    {
+        $kategori = Kategori::where('id_pengguna', Auth::id())
+            ->where('id_kategori', $id)
+            ->firstOrFail();
+        return response()->json($kategori);
+    }
 
-// Ubah fungsi update menjadi seperti ini
-public function update(Request $request, $id)
-{
-    $request->validate([
-        'nama_kategori' => 'required|string|max:100',
-        'tipe_kategori' => 'required|in:pemasukan,pengeluaran',
-    ]);
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'nama_kategori' => 'required|string|max:100',
+            'tipe_kategori' => 'required|in:pemasukan,pengeluaran',
+        ]);
 
-    $kategori = Kategori::where('id_pengguna', Auth::id())
-                        ->where('id_kategori', $id)
-                        ->firstOrFail();
-    
-    $kategori->update([
-        'nama_kategori' => $request->nama_kategori,
-        'tipe'          => $request->tipe_kategori == 'pemasukan' ? 'MASUK' : 'KELUAR',
-    ]);
+        $kategori = Kategori::where('id_pengguna', Auth::id())
+            ->where('id_kategori', $id)
+            ->firstOrFail();
 
-    // Kembalikan JSON, bukan redirect
-    return response()->json([
-        'success' => true,
-        'message' => 'Kategori berhasil diperbarui',
-        'data' => $kategori
-    ]);
-}
+        $kategori->update([
+            'nama_kategori' => $request->nama_kategori,
+            'tipe'          => $request->tipe_kategori == 'pemasukan' ? 'MASUK' : 'KELUAR',
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kategori berhasil diperbarui',
+            'data' => $kategori
+        ]);
+    }
 
     public function destroy($id)
     {
-        $kategori = Kategori::where('id_pengguna', Auth::id())
-                            ->where('id_kategori', $id)
-                            ->firstOrFail();
-        $kategori->delete();
+        try {
+            $kategori = Kategori::where('id_pengguna', Auth::id())
+                ->where('id_kategori', $id)
+                ->firstOrFail();
 
-        return redirect()->back()->with('success', 'Kategori berhasil dihapus!');
+            $kategori->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Kategori berhasil dihapus!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menghapus data: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
-    // Tambahkan fungsi ini di KategoriController.php
     public function allKategori()
     {
-        $idPengguna = Auth::id();
-        $categories = Kategori::where('id_pengguna', $idPengguna)
-                    ->orderBy('nama_kategori', 'asc')
-                    ->get(); // Menggunakan get() agar semua data keluar
+        $categories = Kategori::where('id_pengguna', Auth::id())
+            ->orderBy('nama_kategori', 'asc')
+            ->get();
 
         return response()->json($categories);
     }
