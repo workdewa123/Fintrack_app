@@ -121,7 +121,6 @@
                 <thead>
                     <tr>
                         <th>Rekening</th>
-                        <th>Mata Uang</th>
                         <th>Saldo</th>
                         <th class="text-end">Aksi</th>
                     </tr>
@@ -347,7 +346,6 @@
                             </div>
                         </div>
                     </td>
-                    <td>${rek.mata_uang || 'IDR'}</td>
                     <td class="fw-bold text-dark">Rp ${new Intl.NumberFormat('id-ID').format(rek.saldo)}</td>
                     <td class="text-end">
                         <div class="d-flex justify-content-end gap-2">
@@ -374,7 +372,6 @@
                 document.getElementById('editRekeningId').value = rek.id_rekening;
                 document.getElementById('editNamaRekening').value = rek.nama_rekening;
                 document.getElementById('editSaldoAwal').value = rek.saldo;
-                document.getElementById('editMataUang').value = rek.mata_uang;
                 document.getElementById('editSelectedIcon').value = rek.icon;
                 document.getElementById('editSelectedColor').value = rek.warna;
 

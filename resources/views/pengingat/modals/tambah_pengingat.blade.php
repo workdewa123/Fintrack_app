@@ -21,14 +21,18 @@
                                 <label class="form-label small fw-bold">Nama Pembayaran</label>
                                 <input type="text" name="nama_pembayaran" id="modalNama" class="form-control" placeholder="Mis. Tagihan Listrik" required>
                             </div>
+                            {{-- Ganti bagian Frekuensi Pengingat --}}
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Frekuensi Pengingat</label>
-                                <select name="frekuensi" id="modalFrekuensi" class="form-select">
+                                <select name="frekuensi" id="modalFrekuensi" class="form-select" onchange="toggleDetailJadwal(this.value, 'containerDetailTambah')">
                                     <option value="HARIAN">Harian</option>
                                     <option value="MINGGUAN">Mingguan</option>
                                     <option value="BULANAN">Bulanan</option>
                                 </select>
                             </div>
+
+                            {{-- Wadah dinamis untuk input tambahan --}}
+                            <div id="containerDetailTambah" class="mb-3"></div>
                             <div class="mb-3">
                                 <label class="form-label small fw-bold">Jumlah Pembayaran (Rp)</label>
                                 <input type="number" name="jumlah" id="modalJumlah" class="form-control" placeholder="0" required>

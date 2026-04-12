@@ -104,14 +104,6 @@
                         <label for="saldoAwal" class="form-label">Saldo Awal</label>
                         <input type="number" class="form-control" id="saldoAwal" name="saldo" value="0" min="0" required>
                     </div>
-                    <div class="mb-3">
-                        <label for="mataUang" class="form-label">Mata Uang</label>
-                        <select class="form-select" id="mataUang" name="mata_uang" required>
-                            <option value="IDR" selected>IDR - Rupiah Indonesia</option>
-                            <option value="USD">USD - United States Dollar</option>
-                            <option value="EUR">EUR - Euro</option>
-                        </select>
-                    </div>
 
                     <div class="mb-3">
                         <label class="form-label">Pilih Ikon</label>

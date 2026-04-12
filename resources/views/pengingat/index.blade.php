@@ -171,7 +171,6 @@
                 <thead>
                     <tr>
                         <th class="ps-4">Nama Pembayaran</th>
-                        <th>Tipe</th>
                         <th>Frekuensi</th>
                         <th>Jumlah</th>
                         <th class="text-end pe-4">Aksi</th>
@@ -260,7 +259,6 @@
         body.innerHTML = items.map(item => `
             <tr>
                 <td class="ps-4 fw-bold text-dark">${item.nama_pembayaran}</td>
-                <td><span class="badge-custom badge-expense">${item.tipe}</span></td>
                 <td><span class="text-muted"><i class="bi bi-clock-history me-1"></i> ${item.frekuensi}</span></td>
                 <td class="fw-bold text-danger">${formatter.format(item.jumlah)}</td>
                 <td class="text-end pe-4">
@@ -293,6 +291,39 @@
         }).join('');
     }
 
+    window.toggleDetailJadwal = function(val, containerId, selectedDetail = null) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = ''; // Reset isi
+
+        if (val === 'MINGGUAN') {
+            container.innerHTML = `
+                <label class="form-label small fw-bold text-primary">Pilih Hari Notifikasi</label>
+                <select name="detail_jadwal" class="form-select" required>
+                    <option value="1" ${selectedDetail == 1 ? 'selected' : ''}>Senin</option>
+                    <option value="2" ${selectedDetail == 2 ? 'selected' : ''}>Selasa</option>
+                    <option value="3" ${selectedDetail == 3 ? 'selected' : ''}>Rabu</option>
+                    <option value="4" ${selectedDetail == 4 ? 'selected' : ''}>Kamis</option>
+                    <option value="5" ${selectedDetail == 5 ? 'selected' : ''}>Jumat</option>
+                    <option value="6" ${selectedDetail == 6 ? 'selected' : ''}>Sabtu</option>
+                    <option value="7" ${selectedDetail == 7 ? 'selected' : ''}>Minggu</option>
+                </select>
+                <small class="text-muted">Notifikasi akan muncul setiap hari yang dipilih.</small>
+            `;
+        } else if (val === 'BULANAN') {
+            let options = '';
+            for (let i = 1; i <= 31; i++) {
+                options += `<option value="${i}" ${selectedDetail == i ? 'selected' : ''}>Tanggal ${i}</option>`;
+            }
+            container.innerHTML = `
+                <label class="form-label small fw-bold text-primary">Pilih Tanggal Notifikasi</label>
+                <select name="detail_jadwal" class="form-select" required>
+                    ${options}
+                </select>
+                <small class="text-muted">Notifikasi akan muncul setiap bulan pada tanggal ini.</small>
+            `;
+        }
+    };
+
     window.detailPengingat = function(id) {
         fetch(`/pembayaran-reguler/${id}`)
             .then(res => res.json())
@@ -324,6 +355,8 @@
                 // Load select box dengan data terpilih
                 loadRekeningToModal('editRekening', data.id_rekening);
                 loadKategoriPengeluaranOnly('editKategori', data.id_kategori);
+
+                toggleDetailJadwal(data.frekuensi, 'containerDetailEdit', data.detail_jadwal);
 
                 new bootstrap.Modal(document.getElementById('editPengingatModal')).show();
             });

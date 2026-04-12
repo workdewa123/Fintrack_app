@@ -17,6 +17,7 @@ class Pengingat extends Model
         'id_kategori',
         'nama_pembayaran',
         'frekuensi',
+        'detail_jadwal',
         'tanggal_mulai',
         'tanggal_akhir',
         'jumlah',

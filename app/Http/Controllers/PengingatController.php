@@ -60,6 +60,7 @@ class PengingatController extends Controller
             'id_kategori'     => 'required|exists:kategoris,id_kategori', // Dibuat required karena ini pembayaran rutin
             'nama_pembayaran' => 'required|string|max:100',
             'frekuensi'       => 'required|in:HARIAN,MINGGUAN,BULANAN',
+            'detail_jadwal' => 'nullable|required_if:frekuensi,MINGGUAN,BULANAN|integer',
             'tanggal_mulai'   => 'required|date',
             'tanggal_akhir'   => 'nullable|date|after_or_equal:tanggal_mulai',
             'jumlah'          => 'required|numeric|min:0',
@@ -103,7 +104,8 @@ class PengingatController extends Controller
             'id_rekening'     => 'required|exists:rekenings,id_rekening',
             'id_kategori'     => 'required|exists:kategoris,id_kategori',
             'nama_pembayaran' => 'required|string|max:100',
-            'frekuensi'       => 'required|in:HARIAN,MINGGUAN,BULANAN',
+            'frekuensi'     => 'required|in:HARIAN,MINGGUAN,BULANAN',
+            'detail_jadwal' => 'nullable|required_if:frekuensi,MINGGUAN,BULANAN|integer',
             'tanggal_mulai'   => 'required|date',
             'tanggal_akhir'   => 'nullable|date|after_or_equal:tanggal_mulai',
             'jumlah'          => 'required|numeric|min:0',
