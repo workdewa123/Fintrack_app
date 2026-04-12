@@ -306,181 +306,181 @@
     let currentFilter = 'semua';
 
     document.addEventListener('DOMContentLoaded', function() {
-                loadKategoriData();
+        loadKategoriData();
 
-                // Logika Filter Tab
-                const filterTabs = document.querySelectorAll('.tabs-container .nav-link');
-                filterTabs.forEach(tab => {
-                    tab.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        filterTabs.forEach(t => t.classList.remove('active'));
-                        this.classList.add('active');
-                        currentFilter = this.getAttribute('data-type') || 'semua';
+        // Logika Filter Tab
+        const filterTabs = document.querySelectorAll('.tabs-container .nav-link');
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                filterTabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.getAttribute('data-type') || 'semua';
+                loadKategoriData(1);
+            });
+        });
+
+        // Logika Submit Tambah
+        const tambahForm = document.getElementById('tambahKategoriForm');
+        if (tambahForm) {
+            tambahForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const formData = new FormData(this);
+                fetch(this.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(async res => {
+                        const contentType = res.headers.get("content-type");
+                        if (contentType && contentType.indexOf("application/json") !== -1) {
+                            return res.json().then(data => ({
+                                status: res.status,
+                                body: data
+                            }));
+                        } else {
+                            return {
+                                status: res.status,
+                                body: {
+                                    message: "Server error atau session habis"
+                                }
+                            };
+                        }
+                    })
+                    .then(res => {
+                        if (res.status !== 200 && res.status !== 201) throw new Error(res.body.message || 'Gagal menambah kategori');
+
+                        const modalElem = document.getElementById('tambahKategoriModal');
+                        const modal = bootstrap.Modal.getInstance(modalElem);
+                        if (modal) modal.hide();
+
+                        tambahForm.reset();
+                        showSuccessModal('Berhasil!', 'Kategori telah tersimpan.');
                         loadKategoriData(1);
+                    })
+                    .catch(err => showSuccessModal('Gagal!', err.message, true));
+            });
+        }
+
+        // Logika Submit Edit
+        const editForm = document.getElementById('editKategoriForm');
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const id = document.getElementById('edit_id_kategori').value;
+                const formData = new FormData(this);
+
+                fetch(`/kategori/update/${id}`, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(async res => {
+                        const contentType = res.headers.get("content-type");
+                        if (contentType && contentType.indexOf("application/json") !== -1) {
+                            return res.json().then(data => ({
+                                status: res.status,
+                                body: data
+                            }));
+                        } else {
+                            return {
+                                status: res.status,
+                                body: {
+                                    message: "Gagal memperbarui (Respon bukan JSON)"
+                                }
+                            };
+                        }
+                    })
+                    .then(res => {
+                        if (res.status !== 200) throw new Error(res.body.message || 'Gagal memperbarui data');
+
+                        const modalElem = document.getElementById('editKategoriModal');
+                        const modal = bootstrap.Modal.getInstance(modalElem);
+                        if (modal) modal.hide();
+
+                        showSuccessModal('Berhasil!', 'Kategori telah diedit.');
+                        loadKategoriData(currentPage);
+                    })
+                    .catch(err => showSuccessModal('Gagal!', err.message, true));
+            });
+        }
+
+        // Logika Submit Hapus
+        const deleteForm = document.getElementById('deleteKategoriForm');
+        if (deleteForm) {
+            deleteForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                fetch(this.action, {
+                        method: 'POST',
+                        body: new FormData(this),
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Gagal');
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Tutup modal konfirmasi hapus
+                        const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
+                        if (confirmModal) confirmModal.hide();
+
+                        // Tampilkan notifikasi berhasil (Sesuai keinginan Anda)
+                        showSuccessModal('Terhapus!', 'Kategori berhasil dihapus.');
+
+                        // Refresh tabel otomatis tanpa reload halaman
+                        loadKategoriData(currentPage);
+                    })
+                    .catch(err => {
+                        // Jika ada masalah, munculkan pop up gagal
+                        showSuccessModal('Gagal!', 'Terjadi kesalahan saat menghapus data.', true);
                     });
+            });
+        }
+
+        // Fungsi Fetch Data
+        function loadKategoriData(page = 1) {
+            currentPage = page;
+            fetch(`/kategori/kategori-data?page=${page}&tipe=${currentFilter}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('totalKategoriCount').textContent = data.total;
+                    renderKategoriTable(data.data);
+                    renderPagination(data);
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    document.getElementById('kategoriTableBody').innerHTML = '<tr><td colspan="3" class="text-center text-danger py-4">Gagal memuat data.</td></tr>';
                 });
+        }
 
-                // Logika Submit Tambah
-                const tambahForm = document.getElementById('tambahKategoriForm');
-                if (tambahForm) {
-                    tambahForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        const formData = new FormData(this);
-                        fetch(this.action, {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    'Accept': 'application/json'
-                                }
-                            })
-                            .then(async res => {
-                                const contentType = res.headers.get("content-type");
-                                if (contentType && contentType.indexOf("application/json") !== -1) {
-                                    return res.json().then(data => ({
-                                        status: res.status,
-                                        body: data
-                                    }));
-                                } else {
-                                    return {
-                                        status: res.status,
-                                        body: {
-                                            message: "Server error atau session habis"
-                                        }
-                                    };
-                                }
-                            })
-                            .then(res => {
-                                if (res.status !== 200 && res.status !== 201) throw new Error(res.body.message || 'Gagal menambah kategori');
+        function renderKategoriTable(categories) {
+            const tbody = document.getElementById('kategoriTableBody');
+            const emptyState = document.getElementById('emptyState');
+            tbody.innerHTML = '';
 
-                                const modalElem = document.getElementById('tambahKategoriModal');
-                                const modal = bootstrap.Modal.getInstance(modalElem);
-                                if (modal) modal.hide();
+            if (categories.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
 
-                                tambahForm.reset();
-                                showSuccessModal('Berhasil!', 'Kategori telah tersimpan.');
-                                loadKategoriData(1);
-                            })
-                            .catch(err => showSuccessModal('Gagal!', err.message, true));
-                    });
-                }
+            emptyState.style.display = 'none';
+            categories.forEach(kat => {
+                const isMasuk = kat.tipe === 'MASUK';
+                const badgeClass = isMasuk ? 'badge-income' : 'badge-expense';
+                const tipeText = isMasuk ? 'Pemasukan' : 'Pengeluaran';
+                const iconType = isMasuk ? 'ic:round-trending-up' : 'ic:round-trending-down';
 
-                // Logika Submit Edit
-                const editForm = document.getElementById('editKategoriForm');
-                if (editForm) {
-                    editForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
-                        const id = document.getElementById('edit_id_kategori').value;
-                        const formData = new FormData(this);
-
-                        fetch(`/kategori/update/${id}`, {
-                                method: 'POST',
-                                body: formData,
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    'Accept': 'application/json'
-                                }
-                            })
-                            .then(async res => {
-                                const contentType = res.headers.get("content-type");
-                                if (contentType && contentType.indexOf("application/json") !== -1) {
-                                    return res.json().then(data => ({
-                                        status: res.status,
-                                        body: data
-                                    }));
-                                } else {
-                                    return {
-                                        status: res.status,
-                                        body: {
-                                            message: "Gagal memperbarui (Respon bukan JSON)"
-                                        }
-                                    };
-                                }
-                            })
-                            .then(res => {
-                                if (res.status !== 200) throw new Error(res.body.message || 'Gagal memperbarui data');
-
-                                const modalElem = document.getElementById('editKategoriModal');
-                                const modal = bootstrap.Modal.getInstance(modalElem);
-                                if (modal) modal.hide();
-
-                                showSuccessModal('Berhasil!', 'Kategori telah diedit.');
-                                loadKategoriData(currentPage);
-                            })
-                            .catch(err => showSuccessModal('Gagal!', err.message, true));
-                    });
-                }
-
-                // Logika Submit Hapus
-                const deleteForm = document.getElementById('deleteKategoriForm');
-                if (deleteForm) {
-                    deleteForm.addEventListener('submit', function(e) {
-                        e.preventDefault();
-
-                        fetch(this.action, {
-                                method: 'POST',
-                                body: new FormData(this),
-                                headers: {
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    'Accept': 'application/json'
-                                }
-                            })
-                            .then(response => {
-                                if (!response.ok) throw new Error('Gagal');
-                                return response.json();
-                            })
-                            .then(data => {
-                                // Tutup modal konfirmasi hapus
-                                const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
-                                if (confirmModal) confirmModal.hide();
-
-                                // Tampilkan notifikasi berhasil (Sesuai keinginan Anda)
-                                showSuccessModal('Terhapus!', 'Kategori berhasil dihapus.');
-
-                                // Refresh tabel otomatis tanpa reload halaman
-                                loadKategoriData(currentPage);
-                            })
-                            .catch(err => {
-                                // Jika ada masalah, munculkan pop up gagal
-                                showSuccessModal('Gagal!', 'Terjadi kesalahan saat menghapus data.', true);
-                            });
-                    });
-                }
-
-                // Fungsi Fetch Data
-                function loadKategoriData(page = 1) {
-                    currentPage = page;
-                    fetch(`/kategori/kategori-data?page=${page}&tipe=${currentFilter}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            document.getElementById('totalKategoriCount').textContent = data.total;
-                            renderKategoriTable(data.data);
-                            renderPagination(data);
-                        })
-                        .catch(err => {
-                            console.error('Error:', err);
-                            document.getElementById('kategoriTableBody').innerHTML = '<tr><td colspan="3" class="text-center text-danger py-4">Gagal memuat data.</td></tr>';
-                        });
-                }
-
-                function renderKategoriTable(categories) {
-                    const tbody = document.getElementById('kategoriTableBody');
-                    const emptyState = document.getElementById('emptyState');
-                    tbody.innerHTML = '';
-
-                    if (categories.length === 0) {
-                        emptyState.style.display = 'block';
-                        return;
-                    }
-
-                    emptyState.style.display = 'none';
-                    categories.forEach(kat => {
-                        const isMasuk = kat.tipe === 'MASUK';
-                        const badgeClass = isMasuk ? 'badge-income' : 'badge-expense';
-                        const tipeText = isMasuk ? 'Pemasukan' : 'Pengeluaran';
-                        const iconType = isMasuk ? 'ic:round-trending-up' : 'ic:round-trending-down';
-
-                        tbody.innerHTML += `
+                tbody.innerHTML += `
                 <tr>
                     <td class="ps-4">
                         <div class="d-flex align-items-center">
@@ -507,66 +507,65 @@
                         </div>
                     </td>
                 </tr>`;
-                    });
-                }
+            });
+        }
 
-                function renderPagination(data) {
-                    const linksContainer = document.getElementById('paginationLinks');
-                    const info = document.getElementById('paginationInfo');
-                    linksContainer.innerHTML = '';
-                    if (info) info.textContent = `Menampilkan ${data.from || 0} - ${data.to || 0} dari ${data.total} kategori`;
+        function renderPagination(data) {
+            const linksContainer = document.getElementById('paginationLinks');
+            const info = document.getElementById('paginationInfo');
+            linksContainer.innerHTML = '';
+            if (info) info.textContent = `Menampilkan ${data.from || 0} - ${data.to || 0} dari ${data.total} kategori`;
 
-                    if (data.links) {
-                        data.links.forEach(link => {
-                            const isActive = link.active ? 'active' : '';
-                            const isDisabled = !link.url ? 'disabled' : '';
-                            const label = link.label.replace('&laquo; Previous', '‹').replace('Next &raquo;', '›');
+            if (data.links) {
+                data.links.forEach(link => {
+                    const isActive = link.active ? 'active' : '';
+                    const isDisabled = !link.url ? 'disabled' : '';
+                    const label = link.label.replace('&laquo; Previous', '‹').replace('Next &raquo;', '›');
 
-                            let pageNum = null;
-                            if (link.url) {
-                                const urlObj = new URL(link.url, window.location.origin);
-                                pageNum = urlObj.searchParams.get('page');
-                            }
+                    let pageNum = null;
+                    if (link.url) {
+                        const urlObj = new URL(link.url, window.location.origin);
+                        pageNum = urlObj.searchParams.get('page');
+                    }
 
-                            linksContainer.innerHTML += `
+                    linksContainer.innerHTML += `
                     <li class="page-item ${isActive} ${isDisabled}">
                         <a class="page-link" href="#" onclick="window.changePage(event, ${pageNum})">${label}</a>
                     </li>`;
-                        });
-                    }
-                }
-
-                window.changePage = function(e, page) {
-                    e.preventDefault();
-                    if (page && page !== currentPage) loadKategoriData(page);
-                };
-
-                window.confirmDelete = function(id) {
-                    const form = document.getElementById('deleteKategoriForm');
-                    form.action = `/kategori/destroy/${id}`;
-                    const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-                    modal.show();
-                };
-
-                window.editKategori = function(id) {
-                    fetch(`/kategori/show/${id}`)
-                        .then(res => res.json())
-                        .then(kat => {
-                            document.getElementById('edit_id_kategori').value = kat.id_kategori;
-                            document.getElementById('edit_nama_kategori').value = kat.nama_kategori;
-
-                            if (kat.tipe === 'MASUK') {
-                                document.getElementById('edit_typeMasuk').checked = true;
-                            } else {
-                                document.getElementById('edit_typeKeluar').checked = true;
-                            }
-
-                            const modal = new bootstrap.Modal(document.getElementById('editKategoriModal'));
-                            modal.show();
-                        })
-                        .catch(err => alert('Data tidak ditemukan'));
-}
                 });
+            }
+        }
 
+        window.changePage = function(e, page) {
+            e.preventDefault();
+            if (page && page !== currentPage) loadKategoriData(page);
+        };
+
+        window.confirmDelete = function(id) {
+            const form = document.getElementById('deleteKategoriForm');
+            form.action = `/kategori/destroy/${id}`;
+            const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+            modal.show();
+        };
+
+        window.editKategori = function(id) {
+            fetch(`/kategori/show/${id}`)
+                .then(res => res.json())
+                .then(kat => {
+                    document.getElementById('edit_id_kategori').value = kat.id_kategori;
+                    document.getElementById('edit_nama_kategori').value = kat.nama_kategori;
+
+                    if (kat.tipe === 'MASUK') {
+                        document.getElementById('edit_typeMasuk').checked = true;
+                    } else {
+                        document.getElementById('edit_typeKeluar').checked = true;
+                    }
+
+                    const modal = new bootstrap.Modal(document.getElementById('editKategoriModal'));
+                    modal.show();
+                })
+                .catch(err => alert('Data tidak ditemukan'));
+        }
+    });
 </script>
 @endpush
