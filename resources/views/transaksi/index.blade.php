@@ -31,8 +31,8 @@
     }
 
     .tabs-container .nav-link.active {
-        color: #3b82f6;
-        border-bottom: 3px solid #3b82f6;
+        color: #4a90e2;
+        border-bottom: 3px solid #4a90e2;
     }
 
     /* Table Styles */
@@ -97,7 +97,7 @@
     }
 
     .btn-primary-custom {
-        background-color: #3b82f6;
+        background-color: #4a90e2;
         border: none;
         padding: 0.75rem 1.5rem;
         font-weight: 600;
@@ -106,12 +106,12 @@
     }
 
     .btn-primary-custom:hover {
-        background-color: #2563eb;
+        background-color: #4a90e2;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
     .total-rekening {
-        background-color: #3b82f6;
+        background-color: #4a90e2;
         color: white;
         border-radius: 1.5rem;
     }
@@ -147,7 +147,7 @@
     <div class="row g-4 mb-4">
         <div class="col-md-4">
             <div class="card total-rekening p-4 h-100">
-                <h6 class="text-white-50">Saldo Keseluruhan</h6>
+                <h6 class="text-white-50">Total Keseluruhan</h6>
                 <h2 class="card-text-custom text-white" id="statTotal">Rp 0</h2>
             </div>
         </div>
@@ -327,7 +327,7 @@
                 <td class="ps-4 text-muted">${new Date(item.tanggal_transaksi).toLocaleDateString('id-ID')}</td>
                 <td>
                     <div class="fw-bold text-dark">${item.kategori?.nama_kategori || 'Umum'}</div>
-                    <small class="text-muted">${item.keterangan || '-'}</small> 
+                    <small class="text-muted">${item.keterangan || '-'}</small>
                 </td>
                 <td>
                     <span class="text-secondary small">

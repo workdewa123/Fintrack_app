@@ -18,13 +18,13 @@
     }
 
     .form-control:focus {
-        border-color: #3b82f6;
+        border-color: #4a90e2;
         box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
     }
 
     .btn-primary {
-        background-color: #3b82f6;
-        border-color: #3b82f6;
+        background-color: #4a90e2;
+        border-color: #4a90e2;
         border-radius: 0.5rem;
         padding: 0.75rem 1.5rem;
         font-weight: 600;
@@ -32,8 +32,8 @@
     }
 
     .btn-primary:hover {
-        background-color: #2563eb;
-        border-color: #2563eb;
+        background-color: #4a90e2;
+        border-color: #4a90e2;
     }
 
     .rekening-header {
@@ -202,7 +202,7 @@
                 const formData = new FormData(this);
 
                 fetch(`/rekening/${id}`, {
-                        method: 'POST', 
+                        method: 'POST',
                         body: formData,
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -236,7 +236,7 @@
 
 
 
-                    
+
                     .catch(err => {
                         console.error('Error:', err);
                         showSuccessModal('Gagal!', 'Terjadi kesalahan: ' + (err.message || 'Gagal menyimpan data.'));

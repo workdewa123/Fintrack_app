@@ -12,7 +12,7 @@ class Pengguna extends Authenticatable // Penting: Mengubah ini
 
     protected $table = 'penggunas';
     protected $primaryKey = 'id_pengguna';
-    protected $fillable = ['nama', 'username', 'password'];
+    protected $fillable = ['nama', 'username', 'password', 'foto_profil'];
 
     // Menambahkan hidden field untuk password
     protected $hidden = [

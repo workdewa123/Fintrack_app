@@ -26,7 +26,6 @@ class PengaturanController extends Controller
         if (!$pengaturan) {
             $pengaturan = new Pengaturan();
             $pengaturan->user_id = $userId; // Paksa isi di sini
-            $pengaturan->mata_uang = 'IDR-Rupiah';
             $pengaturan->format_tanggal = 'DD/MM/YYYY';
             $pengaturan->bahasa = 'Indonesia';
             $pengaturan->notifikasi_aktif = false;
@@ -41,27 +40,34 @@ class PengaturanController extends Controller
 
     public function updateProfil(Request $request)
     {
+        $user = \App\Models\Pengguna::findOrFail(Auth::id()); //
+
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'nama' => 'required|string|max:100',
+            'username' => 'required|string|max:50|unique:penggunas,username,' . $user->id_pengguna . ',id_pengguna',
+            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Maksimal 2MB
         ]);
 
-        $user = User::find(Auth::id());
-        if ($user) {
-            $user->name = $request->nama;
+        $user->nama = $request->nama;
+        $user->username = $request->username;
 
-            if ($request->hasFile('foto')) {
-                if ($user->foto_profil && File::exists(public_path('images/profil/' . $user->foto_profil))) {
-                    File::delete(public_path('images/profil/' . $user->foto_profil));
-                }
-                $fileName = time() . '_' . $user->id . '.' . $request->foto->extension();
-                $request->foto->move(public_path('images/profil'), $fileName);
-                $user->foto_profil = $fileName;
+        if ($request->hasFile('foto_profil')) {
+            // Hapus foto lama jika bukan default dan file-nya ada
+            if ($user->foto_profil && file_exists(public_path('images/profil/' . $user->foto_profil))) {
+                unlink(public_path('images/profil/' . $user->foto_profil));
             }
-            $user->save();
-            return back()->with('success', 'Profil berhasil diperbarui!');
+
+            // Upload foto baru
+            $file = $request->file('foto_profil');
+            $namaFile = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images/profil'), $namaFile);
+
+            $user->foto_profil = $namaFile;
         }
-        return back()->with('error', 'Gagal memperbarui profil.');
+
+        $user->save();
+
+        return back()->with('success', 'Profil Anda berhasil diperbarui!');
     }
 
     public function updatePreferensi(Request $request)
@@ -71,7 +77,6 @@ class PengaturanController extends Controller
         if ($pengaturan) {
             $pengaturan->update([
                 'bahasa' => $request->bahasa,
-                'mata_uang' => $request->mata_uang ?? $pengaturan->mata_uang,
             ]);
 
             // Simpan ke session agar layout bisa baca
@@ -80,17 +85,5 @@ class PengaturanController extends Controller
             return back()->with('success', 'Bahasa berhasil diubah ke ' . $request->bahasa);
         }
         return back()->with('error', 'Gagal.');
-    }
-
-    public function updatePin(Request $request)
-    {
-        $request->validate(['pin' => 'required|digits:6']);
-
-        $user = \App\Models\User::find(Auth::id());
-        // Kita simpan di kolom password (atau kolom 'pin' jika kamu punya di tabel users)
-        $user->password = bcrypt($request->pin);
-        $user->save();
-
-        return redirect()->route('pengaturan.index')->with('success', 'PIN Keamanan Berhasil Disimpan!');
     }
 }

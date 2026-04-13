@@ -3,7 +3,7 @@
 @section('content')
 <style>
     .total-rekening {
-        background-color: #3b82f6;
+        background-color: #4a90e2;
         color: white;
         border-radius: 1.5rem;
     }
@@ -105,7 +105,7 @@
         </div>
         <div class="col-lg-4">
             <div class="card p-4 h-100 rounded-4">
-                <h5 class="fw-bold mb-4">Ringkasan Dana</h5>
+                <h5 class="fw-bold mb-4">Ringkasan Dana Bulan Ini</h5>
                 <div class="chart-container d-flex align-items-center justify-content-center">
                     <canvas id="pieChart"></canvas>
                     <div class="position-absolute text-center">

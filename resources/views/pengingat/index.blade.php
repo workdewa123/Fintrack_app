@@ -24,8 +24,8 @@
     }
 
     .tabs-container .nav-link.active {
-        color: #3b82f6;
-        border-bottom: 3px solid #3b82f6;
+        color: #4a90e2;
+        border-bottom: 3px solid #4a90e2;
     }
 
     /* Table Styles */
@@ -81,7 +81,7 @@
     }
 
     .btn-primary-custom {
-        background-color: #3b82f6;
+        background-color: #4a90e2;
         border: none;
         padding: 0.75rem 1.5rem;
         font-weight: 600;
@@ -183,7 +183,7 @@
                 <p class="text-muted mb-0">Belum ada pengingat yang ditemukan.</p>
             </div>
         </div>
-        
+
         <div class="d-flex justify-content-between align-items-center p-4 border-top bg-light">
             <div id="paginationInfo" class="text-muted small fw-medium">Memuat...</div>
             <nav><ul class="pagination pagination-sm mb-0" id="paginationLinks"></ul></nav>
@@ -233,7 +233,7 @@
     }
 
     function loadKategoriPengeluaranOnly(targetId) {
-        fetch('/api/kategori-all') 
+        fetch('/api/kategori-all')
             .then(res => res.json())
             .then(data => {
                 const select = document.getElementById(targetId);
@@ -392,10 +392,10 @@
 
             fetch(`/pembayaran-reguler/${id}`, {
                 method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json', 
+                headers: {
+                    'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json' 
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify(formData)
             })
@@ -452,10 +452,10 @@
                 const formData = new FormData(this);
                 fetch("{{ route('pembayaran.store') }}", {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json', 
+                    headers: {
+                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json' 
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify(Object.fromEntries(formData))
                 })

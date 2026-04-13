@@ -101,7 +101,7 @@
     }
 
     .btn-primary-custom {
-        background-color: #3b82f6;
+        background-color: #4a90e2;
         border: none;
         padding: 0.75rem 1.5rem;
         font-weight: 600;

@@ -213,11 +213,12 @@
 
     {{-- MAIN CONTENT --}}
     <div class="main-content">
+        {{-- TOPBAR --}}
         <div class="topbar">
             {{-- Notifikasi --}}
-            <div class="top-icon-container" 
-                style="position: relative; font-size: 20px; cursor: pointer;" 
-                data-bs-toggle="modal" 
+            <div class="top-icon-container"
+                style="position: relative; font-size: 20px; cursor: pointer;"
+                data-bs-toggle="modal"
                 data-bs-target="#notifikasiModal">
                 <iconify-icon icon="solar:bell-bold"></iconify-icon>
                 @if(isset($tagihanGlobal) && $tagihanGlobal->count() > 0)
@@ -225,17 +226,42 @@
                 @endif
             </div>
 
-            {{-- User Profil --}}
-            <div class="user-info d-flex align-items-center gap-2">
-                @if(Auth::check())
-                <img src="{{ Auth::user()->foto_profil ? asset('images/profil/'.Auth::user()->foto_profil) : 'https://ui-avatars.com/api/?name='.Auth::user()->name }}" class="user-avatar-img">
-                <div class="d-none d-sm-block">
-                    <div class="fw-bold" style="font-size: 0.9rem;">{{ Auth::user()->name }}</div>
-                    <small class="text-muted" style="font-size: 0.75rem;">{{ session('locale') == 'en' ? 'User Account' : 'Akun User' }}</small>
+            {{-- User Profil dengan Dropdown --}}
+            <div class="dropdown">
+                <div class="user-info d-flex align-items-center gap-2" role="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false" style="cursor: pointer;">
+                    @if(Auth::check())
+                        <img src="{{ Auth::user()->foto_profil ? asset('images/profil/'.Auth::user()->foto_profil) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->nama) }}" class="user-avatar-img">
+                        <div class="d-none d-sm-block text-start">
+                            <div class="fw-bold" style="font-size: 0.9rem; line-height: 1.2;">{{ Auth::user()->nama }}</div>
+                            <small class="text-muted" style="font-size: 0.75rem;">{{ session('locale') == 'en' ? 'User Account' : 'Akun User' }}</small>
+                        </div>
+                    @endif
                 </div>
-                @endif
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0" aria-labelledby="dropdownUser" style="border-radius: 12px; min-width: 200px;">
+                    <li>
+                        <a class="dropdown-item py-2" href="#" data-bs-toggle="modal" data-bs-target="#modalEditProfil">
+                            <iconify-icon icon="solar:user-speak-bold" class="me-2"></iconify-icon>
+                            {{ session('locale') == 'en' ? 'Edit Profile' : 'Edit Profil' }}
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item py-2" href="{{ route('pengaturan.index') }}">
+                            <iconify-icon icon="solar:settings-bold" class="me-2"></iconify-icon>
+                            {{ session('locale') == 'en' ? 'Settings' : 'Pengaturan' }}
+                        </a>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="dropdown-item py-2 text-danger">
+                                <iconify-icon icon="solar:logout-bold" class="me-2"></iconify-icon> Logout
+                            </button>
+                        </form>
+                    </li>
+                </ul>
             </div>
-        </div>
+        </div> {{-- Penutup Topbar yang benar --}}
 
         <main>
             {{-- Pesan Alert Global (Sukses/Error) --}}
@@ -248,7 +274,7 @@
 
             @yield('content')
         </main>
-    </div>
+    </div> {{-- Penutup Main-Content yang benar --}}
 
 
     @stack('scripts')
@@ -271,7 +297,7 @@
             .then(data => {
                 if (data.success) {
                     alert(data.message);
-                    location.reload(); 
+                    location.reload();
                 } else {
                     alert('Gagal: ' + data.message);
                 }
@@ -284,7 +310,7 @@
         // 1. Ambil instance modal notifikasi yang sedang terbuka
         const notifModalElem = document.getElementById('notifikasiModal');
         const notifModal = bootstrap.Modal.getInstance(notifModalElem);
-        
+
         // 2. Tutup modal notifikasi terlebih dahulu
         if (notifModal) {
             notifModal.hide();
@@ -314,7 +340,7 @@
             .catch(err => {
                 console.error("Gagal memuat detail:", err);
                 alert("Terjadi kesalahan: " + err.message);
-                
+
                 // Jika gagal, buka kembali modal notifikasi agar user tidak bingung
                 if (notifModal) notifModal.show();
             });
@@ -322,3 +348,4 @@
 </script>
 @include('pengingat.modals.notifikasi')
 @include('pengingat.modals.detail_pengingat')
+@include('pengaturan.modals.edit_profil')
