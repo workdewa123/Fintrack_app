@@ -70,7 +70,7 @@
                     <a href="{{ route('rekening.index') }}" class="btn btn-sm btn-light-custom rounded-pill px-3">
                         Lihat Rekening
                     </a>
-                    <a href="{{ route('laporan.pdf') }}" class="btn btn-sm btn-light-custom rounded-pill px-3">
+                    <a href="{{ route('transaksi.laporan.pdf') }}" class="btn btn-sm btn-light-custom rounded-pill px-3">
                         <i class="bi bi-file-pdf"></i> Cetak PDF
                     </a>
                 </div>

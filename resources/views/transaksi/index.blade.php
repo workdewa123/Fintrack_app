@@ -167,7 +167,7 @@
                     </span>
                     <input type="text" id="txSearch" class="form-control border-0 py-2 shadow-none" placeholder="Cari transaksi...">
                 </div>
-                <a href="{{ route('laporan.pdf') }}" class="btn btn-outline-danger rounded-pill px-3 d-flex align-items-center gap-2">
+                <a href="{{ route('transaksi.laporan.pdf') }}" class="btn btn-outline-danger rounded-pill px-3 d-flex align-items-center gap-2">
                     <iconify-icon icon="mingcute:pdf-fill"></iconify-icon> PDF
                 </a>
                 <button class="btn btn-primary-custom text-white d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
