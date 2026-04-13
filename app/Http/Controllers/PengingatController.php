@@ -8,6 +8,7 @@ use App\Models\Kategori;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class PengingatController extends Controller
 {
@@ -23,7 +24,7 @@ class PengingatController extends Controller
         $search = $request->query('search');
         $frequency = $request->query('frekuensi');
 
-        $query = Pengingat::with(['rekening', 'kategori']);
+        $query = Pengingat::where('id_pengguna', Auth::id())->with(['rekening', 'kategori']);
 
         // Filter Pencarian
         if ($search) {
@@ -42,7 +43,7 @@ class PengingatController extends Controller
     }    // Halaman Form Buat Pengingat (Sesuai Gambar UI)
     public function create()
     {
-        $rekenings = Rekening::all();
+        $rekenings = Rekening::where('id_pengguna', Auth::id())->get();
         $kategoris = Kategori::all();
         return view('pengingat.create', compact('rekenings', 'kategoris'));
     }
@@ -50,24 +51,27 @@ class PengingatController extends Controller
     // Simpan Data ke Database
    public function store(Request $request)
     {
-        // Tambahkan default tipe ke request jika tidak terkirim (opsional, untuk keamanan)
         if (!$request->has('tipe')) {
             $request->merge(['tipe' => 'Pengeluaran']);
         }
 
         $validated = $request->validate([
             'id_rekening'     => 'required|exists:rekenings,id_rekening',
-            'id_kategori'     => 'required|exists:kategoris,id_kategori', // Dibuat required karena ini pembayaran rutin
+            'id_kategori'     => 'required|exists:kategoris,id_kategori',
             'nama_pembayaran' => 'required|string|max:100',
             'frekuensi'       => 'required|in:HARIAN,MINGGUAN,BULANAN',
-            'detail_jadwal' => 'nullable|required_if:frekuensi,MINGGUAN,BULANAN|integer',
+            'detail_jadwal'   => 'nullable|required_if:frekuensi,MINGGUAN,BULANAN|integer',
             'tanggal_mulai'   => 'required|date',
             'tanggal_akhir'   => 'nullable|date|after_or_equal:tanggal_mulai',
             'jumlah'          => 'required|numeric|min:0',
-            'tipe'            => 'required|in:Pengeluaran', // Kunci hanya untuk Pengeluaran
+            'tipe'            => 'required|in:Pengeluaran',
             'komentar'        => 'nullable|string'
         ]);
+
         try {
+            // Masukkan ID user yang sedang login ke dalam data yang akan disimpan
+            $validated['id_pengguna'] = Auth::id(); 
+            
             Pengingat::create($validated);
             return response()->json(['success' => true, 'message' => 'Pengingat berhasil disimpan!']);
         } catch (\Exception $e) {
@@ -80,14 +84,11 @@ class PengingatController extends Controller
     // 1. Ambil data detail untuk Modal Detail & Edit
     public function show($id)
     {
-        // Mengambil data pengingat beserta relasi kategori dan rekeningnya
-        $pengingat = Pengingat::with(['kategori', 'rekening'])->find($id);
+        // Ambil data milik user yang login saja
+        $pengingat = Pengingat::where('id_pengguna', Auth::id())
+            ->with(['kategori', 'rekening'])
+            ->findOrFail($id);
 
-        if (!$pengingat) {
-            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
-        }
-
-        $pengingat = Pengingat::with(['rekening', 'kategori'])->findOrFail($id);
         return response()->json($pengingat);
     }
 

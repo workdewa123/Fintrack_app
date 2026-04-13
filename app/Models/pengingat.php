@@ -13,6 +13,7 @@ class Pengingat extends Model
     protected $primaryKey = 'id_pengingat';
 
     protected $fillable = [
+        'id_pengguna',
         'id_rekening',
         'id_kategori',
         'nama_pembayaran',

@@ -196,7 +196,7 @@
             </a>
 
             {{-- Pengaturan {{ url('/pengaturan') }} --}}
-            <a href="#" class="nav-link {{ request()->is('pengaturan') ? 'active' : '' }}">
+            <a href="{{ route('pengaturan.index') }}" class="nav-link {{ request()->is('pengaturan') ? 'active' : '' }}">
                 <iconify-icon icon="solar:settings-bold"></iconify-icon>
                 {{ session('locale') == 'en' ? 'Settings' : 'Pengaturan' }}
             </a>
