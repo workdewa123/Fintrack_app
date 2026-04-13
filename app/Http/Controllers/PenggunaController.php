@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\File;
 use App\Models\Pengguna;
 
 class PenggunaController extends Controller
@@ -74,5 +75,37 @@ class PenggunaController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/login');
+    }
+    public function updateProfil(Request $request)
+    {
+        // Menggunakan Auth::user() untuk mendapatkan model user yang sedang login
+        $user = Auth::user();
+
+        $request->validate([
+            'nama' => 'required|string|max:100',
+            'username' => 'required|string|max:50|unique:penggunas,username,' . $user->id_pengguna . ',id_pengguna',
+            'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $user->nama = $request->nama;
+        $user->username = $request->username;
+
+        if ($request->hasFile('foto_profil')) {
+            // Hapus foto lama jika ada
+            if ($user->foto_profil && file_exists(public_path('images/profil/' . $user->foto_profil))) {
+                unlink(public_path('images/profil/' . $user->foto_profil));
+            }
+
+            // Upload foto baru
+            $file = $request->file('foto_profil');
+            $namaFile = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('images/profil'), $namaFile);
+
+            $user->foto_profil = $namaFile;
+        }
+
+        $user->save();
+
+        return back()->with('success', 'Profil Anda berhasil diperbarui!');
     }
 }

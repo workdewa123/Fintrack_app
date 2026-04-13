@@ -6,12 +6,13 @@
 
 @section('content')
 <style>
-    /* Konsistensi dengan Rekening Page */
+    /* --- Base Styling --- */
     body {
         font-family: 'Inter', sans-serif;
         background-color: #f8f9fa;
     }
 
+    /* --- Header Section --- */
     .kategori-header {
         background-color: #4a90e2;
         color: white;
@@ -19,7 +20,7 @@
         border-radius: 1rem;
     }
 
-    /* Tabs Styling */
+    /* --- Tabs Navigation --- */
     .tabs-container .nav {
         border-bottom: 1px solid #e2e8f0;
     }
@@ -38,7 +39,7 @@
         border-bottom: 3px solid #3b82f6;
     }
 
-    /* Table Styles */
+    /* --- Table Styling --- */
     .table-container {
         background: white;
         border-radius: 1rem;
@@ -62,7 +63,7 @@
         border-bottom: 1px solid #f1f5f9;
     }
 
-    /* Badge Styles */
+    /* --- Badge Styles --- */
     .badge-custom {
         padding: 0.5rem 1rem;
         border-radius: 0.5rem;
@@ -82,7 +83,7 @@
         border: 1px solid #feb2b2;
     }
 
-    /* Action Buttons */
+    /* --- Action Buttons --- */
     .btn-action {
         width: 32px;
         height: 32px;
@@ -114,7 +115,7 @@
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
-    /* MODAL HAPUS CUSTOM STYLING */
+    /* --- Modal Custom Styling --- */
     .modal-confirm {
         color: #636363;
         width: 400px;
@@ -139,27 +140,6 @@
         color: #ef4444;
         font-size: 46px;
     }
-
-    .modal-confirm .btn-secondary {
-        background: #e2e8f0;
-        color: #64748b;
-        border: none;
-        border-radius: 12px;
-        padding: 10px 20px;
-        font-weight: 600;
-    }
-
-    .modal-confirm .btn-danger {
-        background: #ef4444;
-        border: none;
-        border-radius: 12px;
-        padding: 10px 20px;
-        font-weight: 600;
-    }
-
-    .modal-confirm .btn-danger:hover {
-        background: #dc2626;
-    }
 </style>
 
 <div class="container-fluid py-4 px-md-4">
@@ -168,10 +148,9 @@
         <p class="text-muted">Kelola kategori untuk merapikan setiap transaksi Anda</p>
     </div>
 
-    {{-- Header Card --}}
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card kategori-header text-center shadow-sm">
+            <div class="card kategori-header text-center shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="fw-bold mb-2">Total Kategori Aktif</h5>
                     <h1 class="fw-bold display-5 text-white" id="totalKategoriCount">0</h1>
@@ -180,7 +159,6 @@
         </div>
     </div>
 
-    {{-- Action & Filter Bar --}}
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div class="tabs-container">
             <ul class="nav">
@@ -194,7 +172,6 @@
         </button>
     </div>
 
-    {{-- Tabel Section --}}
     <div class="table-container">
         <div class="table-responsive">
             <table class="table mb-0">
@@ -206,20 +183,17 @@
                     </tr>
                 </thead>
                 <tbody id="kategoriTableBody">
-                    {{-- Diisi oleh JavaScript --}}
-                </tbody>
+                    </tbody>
             </table>
+
             <div id="emptyState" class="text-center py-5" style="display: none;">
                 <iconify-icon icon="line-md:coffee-loop" style="font-size: 3rem;" class="text-muted mb-2"></iconify-icon>
                 <p class="text-muted mb-0">Tidak ada kategori yang ditemukan.</p>
             </div>
         </div>
 
-        {{-- Pagination --}}
         <div class="d-flex justify-content-between align-items-center p-4 border-top bg-light">
-            <div id="paginationInfo" class="text-muted small fw-medium">
-                Memuat data...
-            </div>
+            <div id="paginationInfo" class="text-muted small fw-medium">Memuat data...</div>
             <nav>
                 <ul class="pagination pagination-sm mb-0" id="paginationLinks"></ul>
             </nav>
@@ -227,11 +201,9 @@
     </div>
 </div>
 
-{{-- Modal Tambah & Edit --}}
 @include('kategori.modals.tambah_kategori')
 @include('kategori.modals.edit_kategori')
 
-{{-- Modal Konfirmasi Hapus Custom --}}
 <div id="confirmDeleteModal" class="modal fade" tabindex="-1">
     <div class="modal-dialog modal-confirm modal-dialog-centered">
         <div class="modal-content">
@@ -245,23 +217,22 @@
                 <p class="text-muted px-3">Data kategori yang dihapus tidak dapat dikembalikan. Ini mungkin mempengaruhi histori transaksi Anda.</p>
             </div>
             <div class="modal-footer border-0 justify-content-center gap-2">
-                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-secondary px-4 text-secondary border-0" style="background: #e2e8f0; border-radius: 12px; font-weight: 600; padding: 10px 20px;" data-bs-dismiss="modal">Batal</button>
                 <form id="deleteKategoriForm" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger px-4">Ya, Hapus!</button>
+                    <button type="submit" class="btn btn-danger px-4" style="background: #ef4444; border-radius: 12px; font-weight: 600; padding: 10px 20px;">Ya, Hapus!</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
 
-{{-- Modal Sukses (Disesuaikan dengan referensi gambar) --}}
 <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content rounded-4 border-0 shadow" style="border-radius: 1.5rem !important;">
             <div class="modal-body text-center p-4">
-                <div class="modal-success-icon mb-3" id="iconContainer" style="width: 60px; height: 60px; background-color: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 1.75rem;">
+                <div class="mb-3" id="iconContainer" style="width: 60px; height: 60px; background-color: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 1.75rem;">
                     <iconify-icon id="modalIcon" icon="line-md:confirm-circle-twotone"></iconify-icon>
                 </div>
                 <h5 class="fw-bold mb-2" id="successTitle">Berhasil!</h5>
@@ -277,7 +248,11 @@
 
 @push('scripts')
 <script>
-    // Fungsi Global untuk Modal Sukses/Gagal
+    // --- Global State ---
+    let currentPage = 1;
+    let currentFilter = 'semua';
+
+    // --- Core Functions ---
     function showSuccessModal(title, message, isError = false) {
         const titleElem = document.getElementById('successTitle');
         const messageElem = document.getElementById('successMessage');
@@ -297,275 +272,177 @@
             modalIcon.setAttribute('icon', 'line-md:confirm-circle-twotone');
         }
 
-        const successModalElem = document.getElementById('successModal');
-        const successModal = new bootstrap.Modal(successModalElem);
-        successModal.show();
+        new bootstrap.Modal(document.getElementById('successModal')).show();
     }
 
-    let currentPage = 1;
-    let currentFilter = 'semua';
+    function loadKategoriData(page = 1) {
+        currentPage = page;
+        fetch(`/kategori/kategori-data?page=${page}&tipe=${currentFilter}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('totalKategoriCount').textContent = data.total;
+                renderKategoriTable(data.data);
+                renderPagination(data);
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                document.getElementById('kategoriTableBody').innerHTML = '<tr><td colspan="3" class="text-center text-danger py-4">Gagal memuat data.</td></tr>';
+            });
+    }
 
+    // --- Table Rendering ---
+    function renderKategoriTable(categories) {
+        const tbody = document.getElementById('kategoriTableBody');
+        const emptyState = document.getElementById('emptyState');
+        tbody.innerHTML = '';
+
+        if (categories.length === 0) {
+            emptyState.style.display = 'block';
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        categories.forEach(kat => {
+            const isMasuk = kat.tipe === 'MASUK';
+            tbody.innerHTML += `
+            <tr>
+                <td class="ps-4">
+                    <div class="d-flex align-items-center">
+                        <div class="btn-action me-3 border-0 bg-light">
+                            <iconify-icon icon="ic:round-label" class="${isMasuk ? 'text-success' : 'text-danger'}" style="font-size: 1.2rem;"></iconify-icon>
+                        </div>
+                        <span class="fw-bold text-dark">${kat.nama_kategori}</span>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge-custom ${isMasuk ? 'badge-income' : 'badge-expense'} d-inline-flex align-items-center gap-1">
+                        <iconify-icon icon="${isMasuk ? 'ic:round-trending-up' : 'ic:round-trending-down'}"></iconify-icon>
+                        ${isMasuk ? 'Pemasukan' : 'Pengeluaran'}
+                    </span>
+                </td>
+                <td class="text-end pe-4">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button class="btn-action" title="Edit" onclick="editKategori(${kat.id_kategori})">
+                            <iconify-icon icon="ic:round-edit" class="text-primary"></iconify-icon>
+                        </button>
+                        <button type="button" class="btn-action" title="Hapus" onclick="confirmDelete(${kat.id_kategori})">
+                            <iconify-icon icon="ic:round-delete" class="text-danger"></iconify-icon>
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
+        });
+    }
+
+    function renderPagination(data) {
+        const linksContainer = document.getElementById('paginationLinks');
+        const info = document.getElementById('paginationInfo');
+        linksContainer.innerHTML = '';
+        if (info) info.textContent = `Menampilkan ${data.from || 0} - ${data.to || 0} dari ${data.total} kategori`;
+
+        if (data.links) {
+            data.links.forEach(link => {
+                let pageNum = link.url ? new URL(link.url, window.location.origin).searchParams.get('page') : null;
+                linksContainer.innerHTML += `
+                <li class="page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}">
+                    <a class="page-link shadow-none" href="#" onclick="window.changePage(event, ${pageNum})">
+                        ${link.label.replace('&laquo; Previous', '‹').replace('Next &raquo;', '›')}
+                    </a>
+                </li>`;
+            });
+        }
+    }
+
+    // --- Action Handlers ---
+    window.changePage = function(e, page) {
+        e.preventDefault();
+        if (page && page !== currentPage) loadKategoriData(page);
+    };
+
+    window.confirmDelete = function(id) {
+        document.getElementById('deleteKategoriForm').action = `/kategori/destroy/${id}`;
+        new bootstrap.Modal(document.getElementById('confirmDeleteModal')).show();
+    };
+
+    window.editKategori = function(id) {
+        fetch(`/kategori/show/${id}`)
+            .then(res => res.json())
+            .then(kat => {
+                document.getElementById('edit_id_kategori').value = kat.id_kategori;
+                document.getElementById('edit_nama_kategori').value = kat.nama_kategori;
+                document.getElementById(kat.tipe === 'MASUK' ? 'edit_typeMasuk' : 'edit_typeKeluar').checked = true;
+                new bootstrap.Modal(document.getElementById('editKategoriModal')).show();
+            })
+            .catch(() => alert('Data tidak ditemukan'));
+    };
+
+    // --- Initialization & Form Listeners ---
     document.addEventListener('DOMContentLoaded', function() {
         loadKategoriData();
 
-        // Logika Filter Tab
-        const filterTabs = document.querySelectorAll('.tabs-container .nav-link');
-        filterTabs.forEach(tab => {
+        // Filter Tabs
+        document.querySelectorAll('.tabs-container .nav-link').forEach(tab => {
             tab.addEventListener('click', function(e) {
                 e.preventDefault();
-                filterTabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tabs-container .nav-link').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
                 currentFilter = this.getAttribute('data-type') || 'semua';
                 loadKategoriData(1);
             });
         });
 
-        // Logika Submit Tambah
-        const tambahForm = document.getElementById('tambahKategoriForm');
-        if (tambahForm) {
-            tambahForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                fetch(this.action, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(async res => {
-                        const contentType = res.headers.get("content-type");
-                        if (contentType && contentType.indexOf("application/json") !== -1) {
-                            return res.json().then(data => ({
-                                status: res.status,
-                                body: data
-                            }));
-                        } else {
-                            return {
-                                status: res.status,
-                                body: {
-                                    message: "Server error atau session habis"
-                                }
-                            };
-                        }
-                    })
-                    .then(res => {
-                        if (res.status !== 200 && res.status !== 201) throw new Error(res.body.message || 'Gagal menambah kategori');
-
-                        const modalElem = document.getElementById('tambahKategoriModal');
-                        const modal = bootstrap.Modal.getInstance(modalElem);
-                        if (modal) modal.hide();
-
-                        tambahForm.reset();
-                        showSuccessModal('Berhasil!', 'Kategori telah tersimpan.');
-                        loadKategoriData(1);
-                    })
-                    .catch(err => showSuccessModal('Gagal!', err.message, true));
-            });
-        }
-
-        // Logika Submit Edit
-        const editForm = document.getElementById('editKategoriForm');
-        if (editForm) {
-            editForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const id = document.getElementById('edit_id_kategori').value;
-                const formData = new FormData(this);
-
-                fetch(`/kategori/update/${id}`, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(async res => {
-                        const contentType = res.headers.get("content-type");
-                        if (contentType && contentType.indexOf("application/json") !== -1) {
-                            return res.json().then(data => ({
-                                status: res.status,
-                                body: data
-                            }));
-                        } else {
-                            return {
-                                status: res.status,
-                                body: {
-                                    message: "Gagal memperbarui (Respon bukan JSON)"
-                                }
-                            };
-                        }
-                    })
-                    .then(res => {
-                        if (res.status !== 200) throw new Error(res.body.message || 'Gagal memperbarui data');
-
-                        const modalElem = document.getElementById('editKategoriModal');
-                        const modal = bootstrap.Modal.getInstance(modalElem);
-                        if (modal) modal.hide();
-
-                        showSuccessModal('Berhasil!', 'Kategori telah diedit.');
-                        loadKategoriData(currentPage);
-                    })
-                    .catch(err => showSuccessModal('Gagal!', err.message, true));
-            });
-        }
-
-        // Logika Submit Hapus
-        const deleteForm = document.getElementById('deleteKategoriForm');
-        if (deleteForm) {
-            deleteForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                fetch(this.action, {
-                        method: 'POST',
-                        body: new FormData(this),
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Gagal');
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Tutup modal konfirmasi hapus
-                        const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
-                        if (confirmModal) confirmModal.hide();
-
-                        // Tampilkan notifikasi berhasil (Sesuai keinginan Anda)
-                        showSuccessModal('Terhapus!', 'Kategori berhasil dihapus.');
-
-                        // Refresh tabel otomatis tanpa reload halaman
-                        loadKategoriData(currentPage);
-                    })
-                    .catch(err => {
-                        // Jika ada masalah, munculkan pop up gagal
-                        showSuccessModal('Gagal!', 'Terjadi kesalahan saat menghapus data.', true);
-                    });
-            });
-        }
-
-        // Fungsi Fetch Data
-        function loadKategoriData(page = 1) {
-            currentPage = page;
-            fetch(`/kategori/kategori-data?page=${page}&tipe=${currentFilter}`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('totalKategoriCount').textContent = data.total;
-                    renderKategoriTable(data.data);
-                    renderPagination(data);
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                    document.getElementById('kategoriTableBody').innerHTML = '<tr><td colspan="3" class="text-center text-danger py-4">Gagal memuat data.</td></tr>';
-                });
-        }
-
-        function renderKategoriTable(categories) {
-            const tbody = document.getElementById('kategoriTableBody');
-            const emptyState = document.getElementById('emptyState');
-            tbody.innerHTML = '';
-
-            if (categories.length === 0) {
-                emptyState.style.display = 'block';
-                return;
-            }
-
-            emptyState.style.display = 'none';
-            categories.forEach(kat => {
-                const isMasuk = kat.tipe === 'MASUK';
-                const badgeClass = isMasuk ? 'badge-income' : 'badge-expense';
-                const tipeText = isMasuk ? 'Pemasukan' : 'Pengeluaran';
-                const iconType = isMasuk ? 'ic:round-trending-up' : 'ic:round-trending-down';
-
-                tbody.innerHTML += `
-                <tr>
-                    <td class="ps-4">
-                        <div class="d-flex align-items-center">
-                            <div class="btn-action me-3 border-0 bg-light">
-                                <iconify-icon icon="ic:round-label" class="${isMasuk ? 'text-success' : 'text-danger'}" style="font-size: 1.2rem;"></iconify-icon>
-                            </div>
-                            <span class="fw-bold text-dark">${kat.nama_kategori}</span>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="badge-custom ${badgeClass} d-inline-flex align-items-center gap-1">
-                            <iconify-icon icon="${iconType}"></iconify-icon>
-                            ${tipeText}
-                        </span>
-                    </td>
-                    <td class="text-end pe-4">
-                        <div class="d-flex justify-content-end gap-2">
-                            <button class="btn-action" title="Edit" onclick="editKategori(${kat.id_kategori})">
-                                <iconify-icon icon="ic:round-edit" class="text-primary"></iconify-icon>
-                            </button>
-                            <button type="button" class="btn-action" title="Hapus" onclick="confirmDelete(${kat.id_kategori})">
-                                <iconify-icon icon="ic:round-delete" class="text-danger"></iconify-icon>
-                            </button>
-                        </div>
-                    </td>
-                </tr>`;
-            });
-        }
-
-        function renderPagination(data) {
-            const linksContainer = document.getElementById('paginationLinks');
-            const info = document.getElementById('paginationInfo');
-            linksContainer.innerHTML = '';
-            if (info) info.textContent = `Menampilkan ${data.from || 0} - ${data.to || 0} dari ${data.total} kategori`;
-
-            if (data.links) {
-                data.links.forEach(link => {
-                    const isActive = link.active ? 'active' : '';
-                    const isDisabled = !link.url ? 'disabled' : '';
-                    const label = link.label.replace('&laquo; Previous', '‹').replace('Next &raquo;', '›');
-
-                    let pageNum = null;
-                    if (link.url) {
-                        const urlObj = new URL(link.url, window.location.origin);
-                        pageNum = urlObj.searchParams.get('page');
-                    }
-
-                    linksContainer.innerHTML += `
-                    <li class="page-item ${isActive} ${isDisabled}">
-                        <a class="page-link" href="#" onclick="window.changePage(event, ${pageNum})">${label}</a>
-                    </li>`;
-                });
-            }
-        }
-
-        window.changePage = function(e, page) {
+        // Add Form Logic
+        document.getElementById('tambahKategoriForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
-            if (page && page !== currentPage) loadKategoriData(page);
-        };
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                bootstrap.Modal.getInstance(document.getElementById('tambahKategoriModal'))?.hide();
+                this.reset();
+                showSuccessModal('Berhasil!', 'Kategori telah tersimpan.');
+                loadKategoriData(1);
+            })
+            .catch(err => showSuccessModal('Gagal!', err.message, true));
+        });
 
-        window.confirmDelete = function(id) {
-            const form = document.getElementById('deleteKategoriForm');
-            form.action = `/kategori/destroy/${id}`;
-            const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
-            modal.show();
-        };
+        // Edit Form Logic
+        document.getElementById('editKategoriForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('edit_id_kategori').value;
+            fetch(`/kategori/update/${id}`, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(() => {
+                bootstrap.Modal.getInstance(document.getElementById('editKategoriModal'))?.hide();
+                showSuccessModal('Berhasil!', 'Kategori telah diedit.');
+                loadKategoriData(currentPage);
+            })
+            .catch(err => showSuccessModal('Gagal!', err.message, true));
+        });
 
-        window.editKategori = function(id) {
-            fetch(`/kategori/show/${id}`)
-                .then(res => res.json())
-                .then(kat => {
-                    document.getElementById('edit_id_kategori').value = kat.id_kategori;
-                    document.getElementById('edit_nama_kategori').value = kat.nama_kategori;
-
-                    if (kat.tipe === 'MASUK') {
-                        document.getElementById('edit_typeMasuk').checked = true;
-                    } else {
-                        document.getElementById('edit_typeKeluar').checked = true;
-                    }
-
-                    const modal = new bootstrap.Modal(document.getElementById('editKategoriModal'));
-                    modal.show();
-                })
-                .catch(err => alert('Data tidak ditemukan'));
-        }
+        // Delete Form Logic
+        document.getElementById('deleteKategoriForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }
+            })
+            .then(res => res.json())
+            .then(() => {
+                bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'))?.hide();
+                showSuccessModal('Terhapus!', 'Kategori berhasil dihapus.');
+                loadKategoriData(currentPage);
+            })
+            .catch(() => showSuccessModal('Gagal!', 'Terjadi kesalahan saat menghapus data.', true));
+        });
     });
 </script>
 @endpush

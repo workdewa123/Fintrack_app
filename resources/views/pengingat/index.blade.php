@@ -4,13 +4,13 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
-    /* Konsistensi dengan Halaman Transaksi */
+    /* --- Base Styling --- */
     body {
         font-family: 'Inter', sans-serif;
         background-color: #f8f9fa;
     }
 
-    /* Tabs Styling */
+    /* --- Tabs Styling --- */
     .tabs-container .nav {
         border-bottom: 1px solid #e2e8f0;
     }
@@ -30,7 +30,7 @@
         border-bottom: 3px solid #4a90e2;
     }
 
-    /* Table Styles */
+    /* --- Table Styling --- */
     .table-container {
         background: white;
         border-radius: 1rem;
@@ -52,14 +52,13 @@
         border: none;
     }
 
-
     .table tbody td {
         vertical-align: middle;
         padding: 1.25rem 1rem;
         border-bottom: 1px solid #f1f5f9;
     }
 
-    /* Badge & Button Styles */
+    /* --- UI Components --- */
     .badge-custom {
         padding: 0.5rem 1rem;
         border-radius: 0.5rem;
@@ -102,6 +101,7 @@
         text-decoration: none;
     }
 
+    /* --- Statistics Card --- */
     .card-stat-blue {
         background-color: #4a90e2;
         color: white;
@@ -121,7 +121,7 @@
         margin-top: 0.5rem;
     }
 
-    /* Highlight untuk input yang kosong */
+    /* --- Validation Styling --- */
     .form-control.is-invalid,
     .form-select.is-invalid {
         border-color: #dc3545 !important;
@@ -140,7 +140,6 @@
         <p class="text-muted">Kelola pengingat transaksi otomatis Anda di sini</p>
     </div>
 
-    {{-- Statistik Card --}}
     <div class="row mb-4">
         <div class="col-12">
             <div class="card card-stat-blue shadow-sm">
@@ -150,7 +149,6 @@
         </div>
     </div>
 
-    {{-- Filter & Search Bar --}}
     <div class="row mb-4 align-items-center g-3">
         <div class="col-md-7">
             <div class="tabs-container">
@@ -177,7 +175,6 @@
         </div>
     </div>
 
-    {{-- Table Section --}}
     <div class="table-container shadow-sm">
         <div class="table-responsive">
             <table class="table mb-0">
@@ -191,6 +188,7 @@
                 </thead>
                 <tbody id="pengingatTableBody"></tbody>
             </table>
+
             <div id="emptyState" class="text-center py-5" style="display: none;">
                 <iconify-icon icon="line-md:calendar-remove" style="font-size: 3rem;" class="text-muted mb-2"></iconify-icon>
                 <p class="text-muted mb-0">Belum ada pengingat yang ditemukan.</p>
@@ -210,11 +208,51 @@
 @include('pengingat.modals.edit_pengingat')
 @include('pengingat.modals.detail_pengingat')
 
+<div id="confirmDeleteModal" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-confirm modal-dialog-centered">
+        <div class="modal-content border-0 shadow" style="border-radius: 20px;">
+            <div class="modal-header border-0 justify-content-center pt-4">
+                <div class="icon-box" style="width: 80px; height: 80px; border-radius: 50%; background: #fee2e2; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 46px;">
+                    <iconify-icon icon="line-md:alert-circle-loop"></iconify-icon>
+                </div>
+            </div>
+            <div class="modal-body text-center p-0">
+                <h4 class="fw-bold">Apakah Anda yakin?</h4>
+                <p class="text-muted px-3">Pengingat ini akan dihapus permanen. Aksi ini tidak dapat dibatalkan.</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center gap-2 pb-4">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal" style="border-radius: 12px;">Batal</button>
+                <form id="deletePengingatForm" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger px-4" style="border-radius: 12px; background: #ef4444; border: none;">Ya, Hapus!</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="successModalCustom" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow" style="border-radius: 1.5rem !important;">
+            <div class="modal-body text-center p-4">
+                <div class="mb-3" id="iconContainerCustom" style="width: 60px; height: 60px; background-color: #ecfdf5; color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 1.75rem;">
+                    <iconify-icon id="modalIconCustom" icon="line-md:confirm-circle-twotone"></iconify-icon>
+                </div>
+                <h5 class="fw-bold mb-2" id="successTitleCustom">Berhasil!</h5>
+                <p class="text-muted mb-4" id="successMessageCustom">Data telah diperbarui.</p>
+                <div class="d-grid">
+                    <button type="button" class="btn btn-primary-custom text-white rounded-pill py-2" data-bs-dismiss="modal">Selesai</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
-    // Konfigurasi Global
+    // --- Global Configuration ---
     let currentFrekuensi = 'semua';
     let searchQuery = '';
     let currentPage = 1;
@@ -224,7 +262,7 @@
         minimumFractionDigits: 0
     });
 
-
+    // --- Core Data Loading ---
     function loadPengingat(page = 1) {
         currentPage = page;
         fetch(`/pembayaran-reguler/data?page=${page}&frekuensi=${currentFrekuensi}&search=${searchQuery}`)
@@ -236,7 +274,6 @@
             })
             .catch(err => console.error("Gagal memuat data:", err));
     }
-
 
     function loadRekeningToModal(targetId) {
         fetch('/api/rekening-all')
@@ -265,31 +302,7 @@
             });
     }
 
-
-    window.confirmDelete = function(id) {
-        Swal.fire({
-            title: 'Hapus Pengingat?',
-            text: "Data ini tidak dapat dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3b82f6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Submit form hapus secara manual
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/pembayaran-reguler/${id}`;
-                form.innerHTML = `@csrf @method('DELETE')`;
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-
-
+    // --- Table Rendering ---
     function renderTable(items) {
         const body = document.getElementById('pengingatTableBody');
         const empty = document.getElementById('emptyState');
@@ -310,11 +323,10 @@
                             <iconify-icon icon="ic:round-remove-red-eye" class="text-primary"></iconify-icon>
                         </button>
                         <button class="btn-action" onclick="editPengingat(${item.id_pengingat})" title="Edit">
-                                                    <i class="bi bi-pencil text-primary"></i>
-
+                            <i class="bi bi-pencil text-primary"></i>
                         </button>
                         <button type="button" class="btn-action" onclick="confirmDelete(${item.id_pengingat})" title="Hapus">
-<i class="bi bi-trash text-danger"></i>
+                            <i class="bi bi-trash text-danger"></i>
                         </button>
                     </div>
                 </td>
@@ -332,6 +344,29 @@
                     ${link.label.replace('&laquo; Previous', '‹').replace('Next &raquo;', '›')}
                 </a></li>`;
         }).join('');
+    }
+
+    // --- Action Functions ---
+    window.confirmDelete = function(id) {
+        Swal.fire({
+            title: 'Hapus Pengingat?',
+            text: "Data ini tidak dapat dikembalikan!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3b82f6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/pembayaran-reguler/${id}`;
+                form.innerHTML = `@csrf @method('DELETE')`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
 
     window.toggleDetailJadwal = function(val, containerId, selectedDetail = null) {
@@ -397,71 +432,17 @@
 
                 loadRekeningToModal('editRekening', data.id_rekening);
                 loadKategoriPengeluaranOnly('editKategori', data.id_kategori);
-
                 toggleDetailJadwal(data.frekuensi, 'containerDetailEdit', data.detail_jadwal);
 
                 new bootstrap.Modal(document.getElementById('editPengingatModal')).show();
             });
     };
 
-    // Handle Form Edit
-    const editForm = document.getElementById('editPengingatForm');
-    if (editForm) {
-        editForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            const requiredFields = editForm.querySelectorAll('[required]');
-            let isValid = true;
-
-            requiredFields.forEach(field => {
-                if (!field.value || field.value === "") {
-                    field.classList.add('is-invalid');
-                    isValid = false;
-                } else {
-                    field.classList.remove('is-invalid');
-                }
-            });
-
-            if (!isValid) {
-                Swal.fire('Perhatian!', 'Harap lengkapi semua bidang yang wajib diisi!', 'warning');
-                return;
-            }
-
-            const id = document.getElementById('editId').value;
-            const formData = Object.fromEntries(new FormData(this));
-
-            fetch(`/pembayaran-reguler/${id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        bootstrap.Modal.getInstance(document.getElementById('editPengingatModal')).hide();
-                        loadPengingat(currentPage);
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: 'Data berhasil diperbarui.',
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                    } else {
-                        Swal.fire('Gagal!', data.message || 'Periksa kembali data Anda.', 'error');
-                    }
-                });
-        });
-    }
-
+    // --- Initialization & Event Listeners ---
     document.addEventListener('DOMContentLoaded', function() {
         loadPengingat(1);
 
-        // Modal Logic
+        // Add Modal Events
         const addModal = document.getElementById('addPengingatModal');
         if (addModal) {
             addModal.addEventListener('show.bs.modal', () => {
@@ -470,17 +451,16 @@
             });
         }
 
-        // Form Submission Logic
+        // Add Form Logic
         const addForm = document.getElementById('addPengingatForm');
         if (addForm) {
             addForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-
                 const requiredFields = addForm.querySelectorAll('[required]');
                 let isValid = true;
 
                 requiredFields.forEach(field => {
-                    if (!field.value || field.value === "") {
+                    if (!field.value) {
                         field.classList.add('is-invalid');
                         isValid = false;
                     } else {
@@ -495,35 +475,76 @@
 
                 const formData = new FormData(this);
                 fetch("{{ route('pembayaran.store') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(Object.fromEntries(formData))
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            bootstrap.Modal.getInstance(addModal).hide();
-                            addForm.reset();
-                            loadPengingat(1);
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil!',
-                                text: 'Pengingat berhasil disimpan.',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                        } else {
-                            Swal.fire('Gagal!', data.message || 'Harap periksa kembali inputan Anda.', 'error');
-                        }
-                    });
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(addModal).hide();
+                        addForm.reset();
+                        loadPengingat(1);
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Pengingat berhasil disimpan.', showConfirmButton: false, timer: 1500 });
+                    } else {
+                        Swal.fire('Gagal!', data.message || 'Harap periksa kembali inputan Anda.', 'error');
+                    }
+                });
             });
         }
 
-        // Tabs & Search Logic
+        // Edit Form Logic
+        const editForm = document.getElementById('editPengingatForm');
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const requiredFields = editForm.querySelectorAll('[required]');
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    Swal.fire('Perhatian!', 'Harap lengkapi semua bidang yang wajib diisi!', 'warning');
+                    return;
+                }
+
+                const id = document.getElementById('editId').value;
+                const formData = Object.fromEntries(new FormData(this));
+
+                fetch(`/pembayaran-reguler/${id}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(document.getElementById('editPengingatModal')).hide();
+                        loadPengingat(currentPage);
+                        Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Data berhasil diperbarui.', showConfirmButton: false, timer: 1500 });
+                    } else {
+                        Swal.fire('Gagal!', data.message || 'Periksa kembali data Anda.', 'error');
+                    }
+                });
+            });
+        }
+
+        // Tabs & Search Interactions
         document.querySelectorAll('.tabs-container .nav-link').forEach(link => {
             link.addEventListener('click', function() {
                 document.querySelectorAll('.tabs-container .nav-link').forEach(l => l.classList.remove('active'));
@@ -540,15 +561,9 @@
             timer = setTimeout(() => loadPengingat(1), 500);
         });
 
-        // Tampilkan Modal sukses jika ada session dari proses DELETE Laravel
+        // Flash Message Handling
         @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Dihapus!',
-            text: "{{ session('success') }}",
-            showConfirmButton: false,
-            timer: 1500
-        });
+        Swal.fire({ icon: 'success', title: 'Dihapus!', text: "{{ session('success') }}", showConfirmButton: false, timer: 1500 });
         @endif
     });
 </script>

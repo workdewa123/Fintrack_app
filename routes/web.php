@@ -6,9 +6,7 @@ use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\RekeningController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\TransaksiController;
-use App\Http\Controllers\TransferController;
 use App\Http\Controllers\PengingatController;
-use App\Http\Controllers\PengaturanController;
 
 // --- PUBLIC ROUTES ---
 Route::get('/', [PenggunaController::class, 'showHalamanAwal'])->name('halaman.awal');
@@ -30,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/kategori-all', [KategoriController::class, 'allKategori'])->name('kategori.all');
 
     Route::post('/logout', [PenggunaController::class, 'logout'])->name('logout');
+    Route::post('/profil', [PenggunaController::class, 'updateProfil'])->name('profil');
 
     // Rekening
     Route::get('/rekening', [RekeningController::class, 'index'])->name('rekening.index');
@@ -38,8 +37,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/rekening/{rekening}', [RekeningController::class, 'show'])->name('show');
     Route::put('/rekening/{rekening}', [RekeningController::class, 'update'])->name('rekening.update');
     Route::delete('/rekening/{rekening}', [RekeningController::class, 'destroy'])->name('rekening.destroy');
-
-    Route::get('/riwayat-transfer', [TransferController::class, 'index'])->name('riwayat.transfer');
 
     // Kategori
     Route::prefix('kategori')->name('kategori.')->group(function () {
@@ -78,17 +75,16 @@ Route::middleware('auth')->group(function () {
     });
     // Resource
     Route::resource('transaksi', TransaksiController::class);
-    Route::resource('transfer', TransferController::class);
     // web.php
 // web.php
 Route::middleware('auth')->group(function () {
     // Rute untuk halaman riwayat transaksi (tampilan)
     Route::get('/riwayat-transaksi', [TransaksiController::class, 'halamanRiwayat'])->name('transaksi.riwayat');
-    
+
     // API Data untuk tabel
     Route::get('/transaksi-data', [TransaksiController::class, 'getTransaksiData']);
         Route::delete('/transaksi/{id}', [TransaksiController::class, 'destroy']);
-    
+
     // Cetak PDF
     Route::get('/laporan/pdf', [TransaksiController::class, 'exportPDF'])->name('laporan.pdf');
 
@@ -96,11 +92,4 @@ Route::middleware('auth')->group(function () {
     Route::resource('transaksi', TransaksiController::class);
 });
 
-    // Pengaturan
-    Route::prefix('pengaturan')->name('pengaturan.')->group(function () {
-        Route::get('/', [PengaturanController::class, 'index'])->name('index');
-        Route::post('/profil', [PengaturanController::class, 'updateProfil'])->name('profil');
-        Route::post('/preferensi', [PengaturanController::class, 'updatePreferensi'])->name('preferensi');
-        Route::post('/pin', [PengaturanController::class, 'updatePin'])->name('pin');
-    });
 });

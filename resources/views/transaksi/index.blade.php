@@ -2,20 +2,40 @@
 
 @section('content')
 <style>
-    /* Konsistensi dengan Kategori & Rekening Page */
+    /* --- Base Styling --- */
     body {
         font-family: 'Inter', sans-serif;
         background-color: #f8f9fa;
     }
 
-    .transaksi-header {
-        background-color: #4a90e2;
-        color: white;
-        padding: 2.5rem 2rem;
-        border-radius: 1rem;
+    /* --- Stats Cards --- */
+    .card-text-custom {
+        font-size: clamp(1.2rem, 3vw, 2rem) !important;
+        word-wrap: break-word;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0.5rem 0;
     }
 
-    /* Tabs Styling */
+    .total-rekening {
+        background-color: #4a90e2;
+        color: white;
+        border-radius: 1.5rem;
+    }
+
+    .total-pemasukan {
+        background-color: #e8f9ef;
+        color: #333;
+        border-radius: 1.5rem;
+    }
+
+    .total-pengeluaran {
+        background-color: #fdeaea;
+        color: #333;
+        border-radius: 1.5rem;
+    }
+
+    /* --- Tabs Navigation --- */
     .tabs-container .nav {
         border-bottom: 1px solid #e2e8f0;
     }
@@ -35,7 +55,7 @@
         border-bottom: 3px solid #4a90e2;
     }
 
-    /* Table Styles */
+    /* --- Table Styling --- */
     .table-container {
         background: white;
         border-radius: 1rem;
@@ -53,32 +73,19 @@
         border: none;
     }
 
-    .table thead tr {
-        background-color: #f1f5f9;
-    }
-
     .table tbody td {
         vertical-align: middle;
         padding: 1.25rem 1rem;
         border-bottom: 1px solid #f1f5f9;
     }
 
-    /* Modifikasi khusus kolom Aksi agar lebih ke kanan */
     .col-aksi {
         width: 120px !important;
         text-align: right !important;
         padding-right: 1.5rem !important;
     }
 
-    /* Badge Styles */
-    .badge-custom {
-        padding: 0.5rem 1rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        font-size: 0.8rem;
-    }
-
-    /* Action Buttons */
+    /* --- Buttons & UI Elements --- */
     .btn-action {
         width: 32px;
         height: 32px;
@@ -109,32 +116,6 @@
         background-color: #4a90e2;
         box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
-
-    .total-rekening {
-        background-color: #4a90e2;
-        color: white;
-        border-radius: 1.5rem;
-    }
-
-    .total-pemasukan {
-        background-color: #e8f9ef;
-        color: #333;
-        border-radius: 1.5rem;
-    }
-
-    .total-pengeluaran {
-        background-color: #fdeaea;
-        color: #333;
-        border-radius: 1.5rem;
-    }
-
-    .card-text-custom {
-        font-size: clamp(1.2rem, 3vw, 2rem) !important;
-        word-wrap: break-word;
-        font-weight: 700;
-        line-height: 1.2;
-        margin: 0.5rem 0;
-    }
 </style>
 
 <div class="container-fluid py-4 px-md-4">
@@ -143,26 +124,23 @@
         <p class="text-muted">Kelola dan pantau detail pengeluaran & pemasukan Anda</p>
     </div>
 
-    {{-- Header Section (Statistics) --}}
     <div class="row g-4 mb-4">
         <div class="col-md-4">
-            <div class="card total-rekening p-4 h-100">
+            <div class="card total-rekening p-4 h-100 border-0 shadow-sm">
                 <h6 class="text-white-50">Total Keseluruhan</h6>
                 <h2 class="card-text-custom text-white" id="statTotal">Rp 0</h2>
             </div>
         </div>
-
         <div class="col-md-4">
-            <div class="card total-pemasukan p-4 h-100">
+            <div class="card total-pemasukan p-4 h-100 border-0 shadow-sm">
                 <div class="card-body p-0">
                     <h6 class="text-muted">Total Pemasukan</h6>
                     <h2 class="card-text-custom text-success" id="statMasuk">Rp 0</h2>
                 </div>
             </div>
         </div>
-
         <div class="col-md-4">
-            <div class="card total-pengeluaran p-4 h-100">
+            <div class="card total-pengeluaran p-4 h-100 border-0 shadow-sm">
                 <div class="card-body p-0">
                     <h6 class="text-muted">Total Pengeluaran</h6>
                     <h2 class="card-text-custom text-danger" id="statKeluar">Rp 0</h2>
@@ -171,7 +149,6 @@
         </div>
     </div>
 
-    {{-- Filter & Action Bar --}}
     <div class="row mb-4 align-items-center g-3">
         <div class="col-md-6">
             <div class="tabs-container">
@@ -200,7 +177,6 @@
         </div>
     </div>
 
-    {{-- Table Section --}}
     <div class="table-container shadow-sm">
         <div class="table-responsive">
             <table class="table mb-0">
@@ -210,24 +186,21 @@
                         <th>Kategori & Catatan</th>
                         <th>Rekening</th>
                         <th>Jumlah</th>
-                        <th class="col-aksi">Aksi</th>
+                        <th class="col-aksi text-end pe-4">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="txTableBody">
-                    {{-- Diisi oleh JavaScript --}}
-                </tbody>
+                    </tbody>
             </table>
+
             <div id="emptyState" class="text-center py-5" style="display: none;">
                 <iconify-icon icon="line-md:coffee-loop" style="font-size: 3rem;" class="text-muted mb-2"></iconify-icon>
                 <p class="text-muted mb-0">Tidak ada transaksi yang ditemukan.</p>
             </div>
         </div>
 
-        {{-- Pagination --}}
         <div class="d-flex justify-content-between align-items-center p-4 border-top bg-light">
-            <div id="txPaginationInfo" class="text-muted small fw-medium">
-                Memuat data...
-            </div>
+            <div id="txPaginationInfo" class="text-muted small fw-medium">Memuat data...</div>
             <nav>
                 <ul class="pagination pagination-sm mb-0" id="txPaginationLinks"></ul>
             </nav>
@@ -236,8 +209,8 @@
 </div>
 
 @include('transaksi.modals.tambah_transaksi')
+@include('transaksi.modals.edit_transaksi')
 
-{{-- Modal Konfirmasi Hapus (Sesuai Gambar 1) --}}
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
         <div class="modal-content border-0 shadow" style="border-radius: 1.5rem;">
@@ -258,7 +231,6 @@
     </div>
 </div>
 
-{{-- Modal Sukses (Sesuai Gambar 2) --}}
 <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
         <div class="modal-content border-0 shadow" style="border-radius: 1.5rem;">
@@ -275,30 +247,29 @@
         </div>
     </div>
 </div>
-
-@include('transaksi.modals.edit_transaksi')
-
 @endsection
 
 @push('scripts')
 <script>
-    // Fungsi untuk memicu modal sukses
-    function showSuccessModal(title, message) {
-        document.getElementById('successModalTitle').innerText = title;
-        document.getElementById('successModalMessage').innerText = message;
-        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
-        successModal.show();
-    }
-
+    // --- Global State ---
     let currentTipe = 'semua';
     let searchQuery = '';
     let currentPage = 1;
+    let transactionIdToDelete = null;
 
     const formatter = new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0
     });
+
+    // --- Core Functions ---
+    function showSuccessModal(title, message) {
+        document.getElementById('successModalTitle').innerText = title;
+        document.getElementById('successModalMessage').innerText = message;
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+        successModal.show();
+    }
 
     function loadTx(page = 1) {
         currentPage = page;
@@ -308,20 +279,52 @@
                 document.getElementById('statTotal').innerText = formatter.format(data.total_volume || 0);
                 document.getElementById('statMasuk').innerText = formatter.format(data.total_pemasukan || 0);
                 document.getElementById('statKeluar').innerText = formatter.format(data.total_pengeluaran || 0);
-
                 renderTable(data.data);
                 renderPagination(data);
             })
             .catch(err => console.error("Error loading data:", err));
     }
 
+    function loadRekeningToModal(targetId = 'rekening', selectedValue = null) {
+        fetch('/api/rekening-all')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById(targetId);
+                if (!select) return;
+                select.innerHTML = '<option disabled selected>Pilih Rekening</option>';
+                data.forEach(r => {
+                    const isSelected = r.id_rekening == selectedValue ? 'selected' : '';
+                    select.innerHTML += `<option value="${r.id_rekening}" ${isSelected}>${r.nama_rekening} (${formatter.format(r.saldo)})</option>`;
+                });
+            });
+    }
+
+    function loadKategoriToModal(targetId = 'kategori', selectedValue = null) {
+        fetch('/api/kategori-all')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById(targetId);
+                if (!select) return;
+                select.innerHTML = '<option disabled selected>Pilih Kategori</option>';
+                data.forEach(k => {
+                    const isSelected = k.id_kategori == selectedValue ? 'selected' : '';
+                    select.innerHTML += `<option value="${k.id_kategori}" data-tipe="${k.tipe}" ${isSelected}>${k.nama_kategori} (${k.tipe})</option>`;
+                });
+            });
+    }
+
+    // --- Table Rendering ---
     function renderTable(items) {
         const body = document.getElementById('txTableBody');
+        const emptyState = document.getElementById('emptyState');
+
         if (!items || items.length === 0) {
-            body.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-muted">Data tidak ditemukan</td></tr>';
+            body.innerHTML = '';
+            emptyState.style.display = 'block';
             return;
         }
 
+        emptyState.style.display = 'none';
         body.innerHTML = items.map(item => `
             <tr>
                 <td class="ps-4 text-muted">${new Date(item.tanggal_transaksi).toLocaleDateString('id-ID')}</td>
@@ -330,9 +333,7 @@
                     <small class="text-muted">${item.keterangan || '-'}</small>
                 </td>
                 <td>
-                    <span class="text-secondary small">
-                        <i class="bi bi-wallet2 me-1"></i>${item.rekening?.nama_rekening || '-'}
-                    </span>
+                    <span class="text-secondary small"><i class="bi bi-wallet2 me-1"></i>${item.rekening?.nama_rekening || '-'}</span>
                     <br>
                     <span class="badge ${item.tipe === 'MASUK' ? 'bg-success' : 'bg-danger'} bg-opacity-10 ${item.tipe === 'MASUK' ? 'text-success' : 'text-danger'} mt-1" style="font-size: 0.7rem;">
                         ${item.tipe}
@@ -343,10 +344,10 @@
                 </td>
                 <td class="col-aksi">
                     <div class="d-flex justify-content-end gap-1">
-                        <button class="btn btn-sm btn-light border rounded-pill" onclick="editTransaksi(${item.id_transaksi})">
+                        <button class="btn btn-sm btn-light border rounded-pill" onclick="editTransaksi(${item.id_transaksi})" title="Edit">
                             <i class="bi bi-pencil text-primary"></i>
                         </button>
-                        <button class="btn btn-sm btn-light border rounded-pill text-danger" onclick="hapusTransaksi(${item.id_transaksi})">
+                        <button class="btn btn-sm btn-light border rounded-pill text-danger" onclick="hapusTransaksi(${item.id_transaksi})" title="Hapus">
                             <i class="bi bi-trash"></i>
                         </button>
                     </div>
@@ -355,6 +356,24 @@
         `).join('');
     }
 
+    function renderPagination(data) {
+        const info = document.getElementById('txPaginationInfo');
+        const links = document.getElementById('txPaginationLinks');
+        if (!info || !links) return;
+
+        info.innerText = `Menampilkan ${data.from || 0} - ${data.to || 0} dari ${data.total || 0} data`;
+        links.innerHTML = (data.links || []).map(link => {
+            let pageNum = link.url ? new URLSearchParams(link.url.split('?')[1]).get('page') : null;
+            return `
+                <li class="page-item ${link.active ? 'active' : ''} ${!link.url ? 'disabled' : ''}">
+                    <a class="page-link shadow-none" href="#" onclick="event.preventDefault(); if(${pageNum}) loadTx(${pageNum})">
+                        ${link.label.replace('&laquo; Previous', '‹').replace('Next &raquo;', '›')}
+                    </a>
+                </li>`;
+        }).join('');
+    }
+
+    // --- Action Handlers ---
     window.editTransaksi = function(id) {
         fetch(`/transaksi/${id}`)
             .then(res => res.json())
@@ -362,91 +381,38 @@
                 document.getElementById('editTransaksiId').value = data.id_transaksi;
                 document.getElementById('editJumlah').value = data.jumlah;
                 document.getElementById('editCatatan').value = data.keterangan || '';
-
                 if (data.tanggal_transaksi) {
-                    const datePart = data.tanggal_transaksi.replace(' ', 'T').substring(0, 16);
-                    document.getElementById('editTanggalWaktu').value = datePart;
+                    document.getElementById('editTanggalWaktu').value = data.tanggal_transaksi.replace(' ', 'T').substring(0, 16);
                 }
-
                 document.getElementById('editJenisTransaksi').value = data.tipe;
                 document.getElementById('editJenisTransaksiHidden').value = data.tipe;
 
                 loadKategoriToModal('editKategori', data.id_kategori);
                 loadRekeningToModal('editRekening', data.id_rekening);
-
                 new bootstrap.Modal(document.getElementById('editTransactionModal')).show();
             });
     };
 
-    // Form Edit Submission
-    const editForm = document.getElementById('editTransactionForm');
-    if (editForm) {
-        editForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const id = document.getElementById('editTransaksiId').value;
-            const formData = {
-                id_rekening: document.getElementById('editRekening').value,
-                id_kategori: document.getElementById('editKategori').value,
-                tipe: document.getElementById('editJenisTransaksiHidden').value,
-                jumlah: document.getElementById('editJumlah').value,
-                tanggal_transaksi: document.getElementById('editTanggalWaktu').value,
-                catatan: document.getElementById('editCatatan').value,
-            };
+    window.hapusTransaksi = function(id) {
+        transactionIdToDelete = id;
+        new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
+    };
 
-            fetch(`/transaksi/${id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        ...formData,
-                        _method: 'PUT'
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    bootstrap.Modal.getInstance(document.getElementById('editTransactionModal')).hide();
-                    showSuccessModal('Berhasil Diperbarui!', 'Transaksi Anda telah berhasil diperbarui.');
-                    loadTx(currentPage);
-                })
-                .catch(err => console.error(err));
-        });
-    }
-
-    function renderPagination(data) {
-        const info = document.getElementById('txPaginationInfo');
-        const links = document.getElementById('txPaginationLinks');
-        if (!info || !links) return;
-
-        info.innerText = `Menampilkan ${data.from || 0} - ${data.to || 0} dari ${data.total || 0} data`;
-
-        links.innerHTML = (data.links || []).map(link => {
-            let pageNum = null;
-            if (link.url) {
-                const urlParams = new URLSearchParams(link.url.split('?')[1]);
-                pageNum = urlParams.get('page');
-            }
-            const isActive = link.active ? 'active' : '';
-            const isDisabled = !link.url ? 'disabled' : '';
-            const label = link.label.replace('&laquo; Previous', '‹').replace('Next &raquo;', '›');
-
-            return `
-                <li class="page-item ${isActive} ${isDisabled}">
-                    <a class="page-link shadow-none" href="#" onclick="event.preventDefault(); if(${pageNum}) loadTx(${pageNum})">
-                        ${label}
-                    </a>
-                </li>
-            `;
-        }).join('');
-    }
-
+    // --- Event Listeners ---
     document.addEventListener('DOMContentLoaded', function() {
         loadTx(1);
         loadRekeningToModal();
         loadKategoriToModal();
 
+        // Search Logic
+        let searchTimer;
+        document.getElementById('txSearch')?.addEventListener('input', (e) => {
+            clearTimeout(searchTimer);
+            searchQuery = e.target.value;
+            searchTimer = setTimeout(() => loadTx(1), 500);
+        });
+
+        // Tab Filter Logic
         document.querySelectorAll('.tabs-container .nav-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -457,140 +423,89 @@
             });
         });
 
-        const kategoriSelect = document.getElementById('kategori');
-        if (kategoriSelect) {
-            kategoriSelect.addEventListener('change', function() {
-                const selectedOption = this.options[this.selectedIndex];
-                const tipe = selectedOption.getAttribute('data-tipe');
-                const jenisVisual = document.getElementById('jenisTransaksi');
-                const jenisHidden = document.getElementById('jenisTransaksiHidden');
-                if (tipe) {
-                    jenisVisual.value = tipe;
-                    jenisHidden.value = tipe;
-                }
-            });
-        }
-
-        let searchTimer;
-        const searchInput = document.getElementById('txSearch');
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                clearTimeout(searchTimer);
-                searchQuery = e.target.value;
-                searchTimer = setTimeout(() => {
-                    loadTx(1);
-                }, 500);
-            });
-        }
+        // Category Selection Sync
+        document.getElementById('kategori')?.addEventListener('change', function() {
+            const tipe = this.options[this.selectedIndex].getAttribute('data-tipe');
+            if (tipe) {
+                document.getElementById('jenisTransaksi').value = tipe;
+                document.getElementById('jenisTransaksiHidden').value = tipe;
+            }
+        });
 
         // Form Add Submission
-        const addForm = document.getElementById('addTransactionForm');
-        if (addForm) {
-            addForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = {
-                    id_rekening: document.getElementById('rekening').value,
-                    id_kategori: document.getElementById('kategori').value,
-                    tipe: document.getElementById('jenisTransaksiHidden').value,
-                    jumlah: document.getElementById('jumlah').value,
-                    tanggal_transaksi: document.getElementById('tanggalWaktu').value,
-                    catatan: document.getElementById('catatan').value,
-                };
+        document.getElementById('addTransactionForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = {
+                id_rekening: document.getElementById('rekening').value,
+                id_kategori: document.getElementById('kategori').value,
+                tipe: document.getElementById('jenisTransaksiHidden').value,
+                jumlah: document.getElementById('jumlah').value,
+                tanggal_transaksi: document.getElementById('tanggalWaktu').value,
+                catatan: document.getElementById('catatan').value,
+            };
 
-                fetch('/api/transaksi-simpan', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(formData)
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            bootstrap.Modal.getInstance(document.getElementById('addTransactionModal')).hide();
-                            addForm.reset();
-                            showSuccessModal('Berhasil Ditambahkan!', 'Transaksi baru telah berhasil disimpan.');
-                            loadTx(1);
-                        } else {
-                            alert('Gagal: ' + data.error);
-                        }
-                    })
-                    .catch(err => console.error(err));
-            });
-        }
-    });
-
-    function loadRekeningToModal(targetId = 'rekening', selectedValue = null) {
-        fetch('/api/rekening-all')
-            .then(res => res.json())
-            .then(data => {
-                const select = document.getElementById(targetId);
-                if (select) {
-                    select.innerHTML = '<option disabled selected>Pilih Rekening</option>';
-                    data.forEach(r => {
-                        const isSelected = r.id_rekening == selectedValue ? 'selected' : '';
-                        select.innerHTML += `<option value="${r.id_rekening}" ${isSelected}>${r.nama_rekening} (Rp ${new Intl.NumberFormat('id-ID').format(r.saldo)})</option>`;
-                    });
-                }
-            });
-    }
-
-    function loadKategoriToModal(targetId = 'kategori', selectedValue = null) {
-        fetch('/api/kategori-all')
-            .then(res => res.json())
-            .then(data => {
-                const select = document.getElementById(targetId);
-                if (select) {
-                    select.innerHTML = '<option disabled selected>Pilih Kategori</option>';
-                    data.forEach(k => {
-                        const isSelected = k.id_kategori == selectedValue ? 'selected' : '';
-                        select.innerHTML += `<option value="${k.id_kategori}" data-tipe="${k.tipe}" ${isSelected}>${k.nama_kategori} (${k.tipe})</option>`;
-                    });
-                }
-            });
-    }
-
-    let transactionIdToDelete = null;
-
-    window.hapusTransaksi = function(id) {
-        transactionIdToDelete = id;
-        const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
-        deleteModal.show();
-    };
-
-    // Bagian Logika Hapus yang diperbarui
-    document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
-        if (!transactionIdToDelete) return;
-
-        fetch(`/transaksi/${transactionIdToDelete}`, {
+            fetch('/api/transaksi-simpan', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    _method: 'DELETE'
-                })
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                body: JSON.stringify(formData)
             })
             .then(res => res.json())
             .then(data => {
-                // Tutup modal konfirmasi
-                const deleteModalElem = document.getElementById('deleteConfirmModal');
-                bootstrap.Modal.getInstance(deleteModalElem).hide();
-
-                if (data.success || data.message) {
-                    // Tampilkan modal notifikasi "Terhapus!" (Gambar 2)
-                    showSuccessModal('Terhapus!', 'Transaksi berhasil dihapus dari riwayat.');
-                    // Refresh tabel
-                    loadTx(currentPage);
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('addTransactionModal')).hide();
+                    this.reset();
+                    showSuccessModal('Berhasil Ditambahkan!', 'Transaksi baru telah berhasil disimpan.');
+                    loadTx(1);
                 } else {
-                    alert('Gagal menghapus transaksi: ' + (data.error || 'Terjadi kesalahan'));
+                    alert('Gagal: ' + data.error);
                 }
+            });
+        });
+
+        // Form Edit Submission
+        document.getElementById('editTransactionForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const id = document.getElementById('editTransaksiId').value;
+            const formData = {
+                id_rekening: document.getElementById('editRekening').value,
+                id_kategori: document.getElementById('editKategori').value,
+                tipe: document.getElementById('editJenisTransaksiHidden').value,
+                jumlah: document.getElementById('editJumlah').value,
+                tanggal_transaksi: document.getElementById('editTanggalWaktu').value,
+                catatan: document.getElementById('editCatatan').value,
+                _method: 'PUT'
+            };
+
+            fetch(`/transaksi/${id}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                body: JSON.stringify(formData)
             })
-            .catch(err => console.error("Error deleting data:", err));
+            .then(res => res.json())
+            .then(() => {
+                bootstrap.Modal.getInstance(document.getElementById('editTransactionModal')).hide();
+                showSuccessModal('Berhasil Diperbarui!', 'Transaksi Anda telah berhasil diperbarui.');
+                loadTx(currentPage);
+            });
+        });
+
+        // Confirm Delete Execution
+        document.getElementById('confirmDeleteBtn')?.addEventListener('click', function() {
+            if (!transactionIdToDelete) return;
+            fetch(`/transaksi/${transactionIdToDelete}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                body: JSON.stringify({ _method: 'DELETE' })
+            })
+            .then(res => res.json())
+            .then(data => {
+                bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal')).hide();
+                if (data.success || data.message) {
+                    showSuccessModal('Terhapus!', 'Transaksi berhasil dihapus dari riwayat.');
+                    loadTx(currentPage);
+                }
+            });
+        });
     });
 </script>
 @endpush

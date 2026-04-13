@@ -15,7 +15,7 @@
 <body>
     <div class="header">
         <h2>Laporan Transaksi Keuangan</h2>
-        <p>Dicetak pada: {{ now()->format('d F Y H:i') }}</p>
+        <p>Dicetak pada: {{ now()->format('d F Y') }}</p>
     </div>
 
     <table>

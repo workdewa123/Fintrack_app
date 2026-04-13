@@ -2,7 +2,7 @@
 
 @section('content')
 <style>
-    /* Global Styles for Rekening Page and Modals */
+    /* --- Gaya Global & Input --- */
     body {
         font-family: 'Inter', sans-serif;
         background-color: #f8f9fa;
@@ -22,6 +22,7 @@
         box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
     }
 
+    /* --- Tombol --- */
     .btn-primary {
         background-color: #4a90e2;
         border-color: #4a90e2;
@@ -36,6 +37,7 @@
         border-color: #4a90e2;
     }
 
+    /* --- Komponen Header & Tabel --- */
     .rekening-header {
         background-color: #4a90e2;
         color: white;
@@ -43,7 +45,6 @@
         border-radius: 1rem;
     }
 
-    /* Table Styles */
     .table thead th {
         background-color: #f1f5f9;
         color: #64748b;
@@ -60,6 +61,7 @@
         border-bottom: 1px solid #f1f5f9;
     }
 
+    /* --- Ikon Rekening --- */
     .account-icon {
         width: 35px;
         height: 35px;
@@ -71,7 +73,7 @@
         font-size: 1.1rem;
     }
 
-    /* Modal Success Styles (Custom) */
+    /* --- Modal Kustom --- */
     .modal-success-icon {
         width: 60px;
         height: 60px;
@@ -94,7 +96,7 @@
 
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card rekening-header text-center shadow-sm">
+            <div class="card rekening-header text-center shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="fw-bold mb-2">Total Saldo Saat Ini</h5>
                     <h1 class="fw-bold display-5 text-white" id="totalSaldo">Rp. 0</h1>
@@ -105,9 +107,11 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="col-md-4">
-            <div class="input-group">
-                <span class="input-group-text bg-white border-end-0 rounded-start-pill"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control border-start-0 rounded-end-pill" id="searchInput" placeholder="Cari Rekening...">
+            <div class="input-group shadow-sm rounded-pill overflow-hidden border">
+                <span class="input-group-text bg-white border-0 ps-3">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control border-0 py-2 shadow-none" id="searchInput" placeholder="Cari Rekening...">
             </div>
         </div>
         <button class="btn btn-primary d-flex align-items-center rounded-pill" data-bs-toggle="modal" data-bs-target="#tambahRekeningModal">
@@ -115,18 +119,20 @@
         </button>
     </div>
 
-    <div class="card shadow-sm mb-4 rounded-4 overflow-hidden">
+    <div class="card shadow-sm mb-4 rounded-4 overflow-hidden border-0">
         <div class="table-responsive">
             <table class="table mb-0">
                 <thead>
                     <tr>
-                        <th>Rekening</th>
+                        <th class="ps-4">Rekening</th>
                         <th>Saldo</th>
-                        <th class="text-end">Aksi</th>
+                        <th class="text-end pe-4">Aksi</th>
                     </tr>
                 </thead>
-                <tbody id="rekeningTableBody"></tbody>
+                <tbody id="rekeningTableBody">
+                    </tbody>
             </table>
+
             <div id="emptyState" class="text-center py-5" style="display: none;">
                 <p class="text-muted mb-0">Belum ada rekening yang ditemukan.</p>
             </div>
@@ -138,13 +144,12 @@
             </div>
             <nav>
                 <ul class="pagination pagination-sm mb-0" id="paginationLinks">
-                </ul>
+                    </ul>
             </nav>
         </div>
     </div>
 </div>
 
-{{-- MODALS --}}
 @include('rekening.modals.tambah_rekening')
 @include('rekening.modals.edit_rekening')
 @include('rekening.modals.hapus_rekening')
@@ -159,20 +164,21 @@
                 <h5 class="fw-bold mb-2" id="successTitle">Berhasil!</h5>
                 <p class="text-muted mb-4" id="successMessage">Data telah disimpan.</p>
                 <div class="d-grid">
-                    <button type="button" class="btn btn-primary rounded-pill py-2" data-bs-dismiss="modal">Selesai</button>
+                    <button type="button" class="btn btn-primary rounded-pill py-2 text-white" data-bs-dismiss="modal">Selesai</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
 <script>
+    // --- Variabel Global ---
     let currentPage = 1;
     let searchQuery = '';
 
+    // --- Fungsi Utilitas ---
     function showSuccessModal(title, message) {
         document.getElementById('successTitle').textContent = title;
         document.getElementById('successMessage').textContent = message;
@@ -180,9 +186,11 @@
         successModal.show();
     }
 
+    // --- Logika Inti Saat Dokumen Siap ---
     document.addEventListener('DOMContentLoaded', function() {
         loadRekeningData();
 
+        // Fitur Pencarian Real-time
         const searchInput = document.getElementById('searchInput');
         if (searchInput) {
             searchInput.addEventListener('input', function(e) {
@@ -191,60 +199,49 @@
             });
         }
 
-        // --- LOGIKA SIMPAN PERUBAHAN (EDIT) ---
+        // --- Logika Simpan Perubahan (Edit) ---
         const editForm = document.getElementById('editRekeningForm');
         if (editForm) {
             editForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-
-                // Ambil ID dari input hidden di dalam form edit
                 const id = document.getElementById('editRekeningId').value;
                 const formData = new FormData(this);
 
                 fetch(`/rekening/${id}`, {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) return response.json().then(err => {
-                            throw err;
-                        });
-                        return response.json();
-                    })
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) return response.json().then(err => { throw err; });
+                    return response.json();
+                })
+                .then(data => {
+                    const modalElem = document.getElementById('editRekeningModal');
+                    const modal = bootstrap.Modal.getInstance(modalElem);
+                    if (modal) modal.hide();
 
-                    .then(data => {
-                        const modalElem = document.getElementById('editRekeningModal');
-                        const modal = bootstrap.Modal.getInstance(modalElem);
+                    // Membersihkan sisa-sisa backdrop modal bootstrap
+                    const backdrop = document.querySelector('.modal-backdrop');
+                    if (backdrop) backdrop.remove();
+                    document.body.classList.remove('modal-open');
+                    document.body.style.overflow = '';
+                    document.body.style.paddingRight = '';
 
-                        if (modal) {
-                            modal.hide();
-                        }
-                        const backdrop = document.querySelector('.modal-backdrop');
-                        if (backdrop) {
-                            backdrop.remove();
-                        }
-                        document.body.classList.remove('modal-open');
-                        document.body.style.overflow = '';
-                        document.body.style.paddingRight = '';
-                        showSuccessModal('Berhasil!', 'Perubahan pada rekening telah disimpan.');
-                        loadRekeningData(currentPage);
-                    })
-
-
-
-
-                    .catch(err => {
-                        console.error('Error:', err);
-                        showSuccessModal('Gagal!', 'Terjadi kesalahan: ' + (err.message || 'Gagal menyimpan data.'));
-                    });
+                    showSuccessModal('Berhasil!', 'Perubahan pada rekening telah disimpan.');
+                    loadRekeningData(currentPage);
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    showSuccessModal('Gagal!', 'Terjadi kesalahan: ' + (err.message || 'Gagal menyimpan data.'));
+                });
             });
         }
 
-        // --- LOGIKA TAMBAH REKENING BARU ---
+        // --- Logika Tambah Rekening Baru ---
         const tambahForm = document.getElementById('tambahRekeningForm');
         if (tambahForm) {
             tambahForm.addEventListener('submit', function(e) {
@@ -252,34 +249,34 @@
                 const formData = new FormData(this);
 
                 fetch('/rekening', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Gagal menambah rekening');
-                        return response.json();
-                    })
-                    .then(data => {
-                        const modalElem = document.getElementById('tambahRekeningModal');
-                        const modal = bootstrap.Modal.getInstance(modalElem);
-                        if (modal) modal.hide();
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Gagal menambah rekening');
+                    return response.json();
+                })
+                .then(data => {
+                    const modalElem = document.getElementById('tambahRekeningModal');
+                    const modal = bootstrap.Modal.getInstance(modalElem);
+                    if (modal) modal.hide();
 
-                        tambahForm.reset();
-                        showSuccessModal('Berhasil!', 'Rekening baru Anda telah berhasil ditambahkan.');
-                        loadRekeningData(1);
-                    })
-                    .catch(err => {
-                        console.error('Error:', err);
-                        showSuccessModal('Gagal!', 'Terjadi kesalahan saat menambah data.');
-                    });
+                    tambahForm.reset();
+                    showSuccessModal('Berhasil!', 'Rekening baru Anda telah berhasil ditambahkan.');
+                    loadRekeningData(1);
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    showSuccessModal('Gagal!', 'Terjadi kesalahan saat menambah data.');
+                });
             });
         }
 
-        // Logika Klik Ikon & Warna di Modal (Tetap Ada)
+        // Inisialisasi pemilih ikon dan warna di modal
         const setupPickers = (modalId, iconInput, colorInput) => {
             document.querySelectorAll(`${modalId} .icon-item`).forEach(item => {
                 item.addEventListener('click', function() {
@@ -301,6 +298,7 @@
         setupPickers('#editRekeningModal', 'editSelectedIcon', 'editSelectedColor');
     });
 
+    // --- Fungsi Pengambilan Data ---
     function loadRekeningData(page = 1) {
         currentPage = page;
         fetch(`/rekening-data?page=${page}&search=${searchQuery}`)
@@ -308,6 +306,8 @@
             .then(data => {
                 renderRekeningTable(data.data);
                 renderPagination(data);
+
+                // Menampilkan total saldo keseluruhan
                 if (data.total_semua_rekening !== undefined) {
                     const formattedTotal = new Intl.NumberFormat('id-ID', {
                         style: 'currency',
@@ -321,6 +321,7 @@
             .catch(err => console.error('Error:', err));
     }
 
+    // --- Fungsi Render Tabel ---
     function renderRekeningTable(rekenings) {
         const tbody = document.getElementById('rekeningTableBody');
         const emptyState = document.getElementById('emptyState');
@@ -335,24 +336,24 @@
         rekenings.forEach(rek => {
             tbody.innerHTML += `
                 <tr>
-                    <td>
+                    <td class="ps-4">
                         <div class="d-flex align-items-center">
                             <div class="account-icon me-3" style="background-color: ${rek.warna || '#4a90e2'}">
                                 <i class="bi ${rek.icon || 'bi-wallet2'}"></i>
                             </div>
                             <div>
                                 <div class="fw-bold text-dark">${rek.nama_rekening}</div>
-                                <div class="text-muted small">Personal</div>
+                                <div class="text-muted small">Personal Account</div>
                             </div>
                         </div>
                     </td>
                     <td class="fw-bold text-dark">Rp ${new Intl.NumberFormat('id-ID').format(rek.saldo)}</td>
-                    <td class="text-end">
+                    <td class="text-end pe-4">
                         <div class="d-flex justify-content-end gap-2">
-                            <button class="btn btn-sm btn-light border" onclick="editRekening(${rek.id_rekening})">
+                            <button class="btn btn-sm btn-light border" onclick="editRekening(${rek.id_rekening})" title="Edit">
                                 <i class="bi bi-pencil text-primary"></i>
                             </button>
-                            <button class="btn btn-sm btn-light border" onclick="deleteRekening(${rek.id_rekening})">
+                            <button class="btn btn-sm btn-light border" onclick="deleteRekening(${rek.id_rekening})" title="Hapus">
                                 <i class="bi bi-trash text-danger"></i>
                             </button>
                         </div>
@@ -362,6 +363,7 @@
         });
     }
 
+    // --- Logika Aksi Baris ---
     window.editRekening = function(id) {
         fetch(`/rekening/${id}`)
             .then(response => {
@@ -375,6 +377,7 @@
                 document.getElementById('editSelectedIcon').value = rek.icon;
                 document.getElementById('editSelectedColor').value = rek.warna;
 
+                // Sinkronisasi status aktif ikon/warna di modal
                 document.querySelectorAll('#editRekeningModal .icon-item').forEach(item => {
                     item.classList.remove('active');
                     if (item.dataset.icon === rek.icon) item.classList.add('active');
@@ -384,9 +387,7 @@
                     if (item.dataset.color === rek.warna) item.classList.add('active');
                 });
 
-                const modalElem = document.getElementById('editRekeningModal');
-                const modal = new bootstrap.Modal(modalElem);
-                modal.show();
+                new bootstrap.Modal(document.getElementById('editRekeningModal')).show();
             })
             .catch(err => alert(err.message));
     };
@@ -397,29 +398,29 @@
             .then(rek => {
                 document.getElementById('deleteRekeningId').value = rek.id_rekening;
                 document.getElementById('hapusRekeningNama').textContent = rek.nama_rekening;
-                const modal = new bootstrap.Modal(document.getElementById('hapusRekeningModal'));
-                modal.show();
+                new bootstrap.Modal(document.getElementById('hapusRekeningModal')).show();
             });
     };
 
     window.executeDelete = function() {
         const id = document.getElementById('deleteRekeningId').value;
         fetch(`/rekening/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('hapusRekeningModal'));
-                if (modal) modal.hide();
-                showSuccessModal('Terhapus!', 'Rekening berhasil dihapus.');
-                loadRekeningData(currentPage);
-            });
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('hapusRekeningModal'));
+            if (modal) modal.hide();
+            showSuccessModal('Terhapus!', 'Rekening berhasil dihapus.');
+            loadRekeningData(currentPage);
+        });
     };
 
+    // --- Fungsi Pagination ---
     function renderPagination(data) {
         const linksContainer = document.getElementById('paginationLinks');
         const info = document.getElementById('paginationInfo');
@@ -433,7 +434,7 @@
                 const label = link.label.replace('&laquo; Previous', '‹').replace('Next &raquo;', '›');
                 linksContainer.innerHTML += `
                     <li class="page-item ${isActive} ${isDisabled}">
-                        <a class="page-link" href="#" onclick="changePage(event, '${link.url}')">${label}</a>
+                        <a class="page-link shadow-none" href="#" onclick="changePage(event, '${link.url}')">${label}</a>
                     </li>
                 `;
             });

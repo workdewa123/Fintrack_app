@@ -195,11 +195,7 @@
                 {{ session('locale') == 'en' ? 'Regular Payment' : 'Pembayaran Reguler' }}
             </a>
 
-            {{-- Pengaturan {{ url('/pengaturan') }} --}}
-            <a href="{{ route('pengaturan.index') }}" class="nav-link {{ request()->is('pengaturan') ? 'active' : '' }}">
-                <iconify-icon icon="solar:settings-bold"></iconify-icon>
-                {{ session('locale') == 'en' ? 'Settings' : 'Pengaturan' }}
-            </a>
+
 
             {{-- Tombol Logout (Tambahan agar fungsional) --}}
             <form action="{{ route('logout') }}" method="POST" class="mt-4 px-3">
@@ -242,12 +238,6 @@
                         <a class="dropdown-item py-2" href="#" data-bs-toggle="modal" data-bs-target="#modalEditProfil">
                             <iconify-icon icon="solar:user-speak-bold" class="me-2"></iconify-icon>
                             {{ session('locale') == 'en' ? 'Edit Profile' : 'Edit Profil' }}
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item py-2" href="{{ route('pengaturan.index') }}">
-                            <iconify-icon icon="solar:settings-bold" class="me-2"></iconify-icon>
-                            {{ session('locale') == 'en' ? 'Settings' : 'Pengaturan' }}
                         </a>
                     </li>
                     <li><hr class="dropdown-divider"></li>
@@ -348,4 +338,4 @@
 </script>
 @include('pengingat.modals.notifikasi')
 @include('pengingat.modals.detail_pengingat')
-@include('pengaturan.modals.edit_profil')
+@include('layout.modals.edit_profil')

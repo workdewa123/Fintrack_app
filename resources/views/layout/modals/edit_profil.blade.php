@@ -5,7 +5,7 @@
                 <h5 class="fw-bold">Edit Profil</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="{{ route('pengaturan.profil') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('profil') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-body px-4">
                     {{-- Preview & Upload Foto --}}
