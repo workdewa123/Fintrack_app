@@ -1,8 +1,6 @@
 @extends('layout.app')
 
 @section('content')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <style>
     /* Konsistensi dengan Halaman Transaksi */
     body {
@@ -67,17 +65,8 @@
         font-size: 0.8rem;
     }
 
-    .badge-income {
-        background-color: #e6fffa;
-        color: #047857;
-        border: 1px solid #b2f5ea;
-    }
-
-    .badge-expense {
-        background-color: #fff5f5;
-        color: #c53030;
-        border: 1px solid #feb2b2;
-    }
+    .badge-income { background-color: #e6fffa; color: #047857; border: 1px solid #b2f5ea; }
+    .badge-expense { background-color: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
 
     .btn-action {
         width: 32px;
@@ -103,11 +92,11 @@
     }
 
     .card-stat-blue {
-        background-color: #4a90e2;
+        background-color: #4a90e2; /* Sesuaikan dengan warna biru di gambar */
         color: white;
         border-radius: 1rem;
         border: none;
-        padding: 3rem 1rem;
+        padding: 3rem 1rem; /* Memberikan ruang vertikal yang lebih luas */
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -116,20 +105,18 @@
     }
 
     .card-text-custom {
-        font-size: 4rem !important;
+        font-size: 4rem !important; /* Ukuran angka yang besar sesuai gambar */
         font-weight: 800;
         margin-top: 0.5rem;
     }
 
     /* Highlight untuk input yang kosong */
-    .form-control.is-invalid,
-    .form-select.is-invalid {
+    .form-control.is-invalid, .form-select.is-invalid {
         border-color: #dc3545 !important;
         background-image: none !important;
     }
 
-    .form-control.is-invalid:focus,
-    .form-select.is-invalid:focus {
+    .form-control.is-invalid:focus, .form-select.is-invalid:focus {
         box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
     }
 </style>
@@ -196,12 +183,10 @@
                 <p class="text-muted mb-0">Belum ada pengingat yang ditemukan.</p>
             </div>
         </div>
-
+        
         <div class="d-flex justify-content-between align-items-center p-4 border-top bg-light">
             <div id="paginationInfo" class="text-muted small fw-medium">Memuat...</div>
-            <nav>
-                <ul class="pagination pagination-sm mb-0" id="paginationLinks"></ul>
-            </nav>
+            <nav><ul class="pagination pagination-sm mb-0" id="paginationLinks"></ul></nav>
         </div>
     </div>
 </div>
@@ -218,13 +203,9 @@
     let currentFrekuensi = 'semua';
     let searchQuery = '';
     let currentPage = 1;
-    const formatter = new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        minimumFractionDigits: 0
-    });
+    const formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
 
-
+    // 1. Fungsi Utama: Load Data
     function loadPengingat(page = 1) {
         currentPage = page;
         fetch(`/pembayaran-reguler/data?page=${page}&frekuensi=${currentFrekuensi}&search=${searchQuery}`)
@@ -237,7 +218,7 @@
             .catch(err => console.error("Gagal memuat data:", err));
     }
 
-
+    // 2. Fungsi Helper: Load Dropdown Modal
     function loadRekeningToModal(targetId) {
         fetch('/api/rekening-all')
             .then(res => res.json())
@@ -252,7 +233,7 @@
     }
 
     function loadKategoriPengeluaranOnly(targetId) {
-        fetch('/api/kategori-all')
+        fetch('/api/kategori-all') 
             .then(res => res.json())
             .then(data => {
                 const select = document.getElementById(targetId);
@@ -265,31 +246,7 @@
             });
     }
 
-
-    window.confirmDelete = function(id) {
-        Swal.fire({
-            title: 'Hapus Pengingat?',
-            text: "Data ini tidak dapat dikembalikan!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3b82f6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Submit form hapus secara manual
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = `/pembayaran-reguler/${id}`;
-                form.innerHTML = `@csrf @method('DELETE')`;
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-
-
+    // 3. Fungsi Render UI
     function renderTable(items) {
         const body = document.getElementById('pengingatTableBody');
         const empty = document.getElementById('emptyState');
@@ -310,12 +267,12 @@
                             <iconify-icon icon="ic:round-remove-red-eye" class="text-primary"></iconify-icon>
                         </button>
                         <button class="btn-action" onclick="editPengingat(${item.id_pengingat})" title="Edit">
-                                                    <i class="bi bi-pencil text-primary"></i>
-
+                            <iconify-icon icon="ic:round-edit" class="text-warning"></iconify-icon>
                         </button>
-                        <button type="button" class="btn-action" onclick="confirmDelete(${item.id_pengingat})" title="Hapus">
-<i class="bi bi-trash text-danger"></i>
-                        </button>
+                        <form action="/pembayaran-reguler/${item.id_pengingat}" method="POST" onsubmit="return confirm('Hapus?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn-action"><iconify-icon icon="ic:round-delete" class="text-danger"></iconify-icon></button>
+                        </form>
                     </div>
                 </td>
             </tr>`).join('');
@@ -336,7 +293,7 @@
 
     window.toggleDetailJadwal = function(val, containerId, selectedDetail = null) {
         const container = document.getElementById(containerId);
-        container.innerHTML = '';
+        container.innerHTML = ''; // Reset isi
 
         if (val === 'MINGGUAN') {
             container.innerHTML = `
@@ -395,6 +352,7 @@
                 document.getElementById('editTglAkhir').value = data.tanggal_akhir || '';
                 document.getElementById('editKomentar').value = data.komentar || '';
 
+                // Load select box dengan data terpilih
                 loadRekeningToModal('editRekening', data.id_rekening);
                 loadKategoriPengeluaranOnly('editKategori', data.id_kategori);
 
@@ -404,12 +362,14 @@
             });
     };
 
+    // Handle Submit Form Edit (Letakkan di dalam DOMContentLoaded)
     // Handle Form Edit
     const editForm = document.getElementById('editPengingatForm');
     if (editForm) {
         editForm.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            // Validasi Sederhana
             const requiredFields = editForm.querySelectorAll('[required]');
             let isValid = true;
 
@@ -423,7 +383,7 @@
             });
 
             if (!isValid) {
-                Swal.fire('Perhatian!', 'Harap lengkapi semua bidang yang wajib diisi!', 'warning');
+                alert('Harap lengkapi semua bidang yang wajib diisi!');
                 return;
             }
 
@@ -431,33 +391,28 @@
             const formData = Object.fromEntries(new FormData(this));
 
             fetch(`/pembayaran-reguler/${id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(formData)
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        bootstrap.Modal.getInstance(document.getElementById('editPengingatModal')).hide();
-                        loadPengingat(currentPage);
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Berhasil!',
-                            text: 'Data berhasil diperbarui.',
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                    } else {
-                        Swal.fire('Gagal!', data.message || 'Periksa kembali data Anda.', 'error');
-                    }
-                });
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json' 
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    bootstrap.Modal.getInstance(document.getElementById('editPengingatModal')).hide();
+                    loadPengingat(currentPage);
+                    alert('Data berhasil diperbarui!');
+                } else {
+                    alert('Gagal memperbarui: ' + (data.message || 'Periksa kembali data Anda.'));
+                }
+            });
         });
     }
 
+    // 4. Inisialisasi Event Listeners (Digabung Jadi Satu)
     document.addEventListener('DOMContentLoaded', function() {
         loadPengingat(1);
 
@@ -476,6 +431,7 @@
             addForm.addEventListener('submit', function(e) {
                 e.preventDefault();
 
+                // Validasi Sederhana
                 const requiredFields = addForm.querySelectorAll('[required]');
                 let isValid = true;
 
@@ -489,37 +445,32 @@
                 });
 
                 if (!isValid) {
-                    Swal.fire('Perhatian!', 'Harap lengkapi semua bidang yang wajib diisi!', 'warning');
+                    alert('Harap lengkapi semua bidang yang wajib diisi!');
                     return;
                 }
 
                 const formData = new FormData(this);
                 fetch("{{ route('pembayaran.store') }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(Object.fromEntries(formData))
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            bootstrap.Modal.getInstance(addModal).hide();
-                            addForm.reset();
-                            loadPengingat(1);
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Berhasil!',
-                                text: 'Pengingat berhasil disimpan.',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                        } else {
-                            Swal.fire('Gagal!', data.message || 'Harap periksa kembali inputan Anda.', 'error');
-                        }
-                    });
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json', 
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json' 
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        bootstrap.Modal.getInstance(addModal).hide();
+                        addForm.reset();
+                        loadPengingat(1);
+                        alert('Berhasil disimpan!');
+                    } else {
+                        // Menampilkan error validasi dari server jika ada
+                        alert('Gagal: ' + (data.message || 'Harap periksa kembali inputan Anda.'));
+                    }
+                });
             });
         }
 
@@ -539,17 +490,6 @@
             searchQuery = e.target.value;
             timer = setTimeout(() => loadPengingat(1), 500);
         });
-
-        // Tampilkan Modal sukses jika ada session dari proses DELETE Laravel
-        @if(session('success'))
-        Swal.fire({
-            icon: 'success',
-            title: 'Dihapus!',
-            text: "{{ session('success') }}",
-            showConfirmButton: false,
-            timer: 1500
-        });
-        @endif
     });
 </script>
 @endpush
