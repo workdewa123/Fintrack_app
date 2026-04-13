@@ -8,11 +8,17 @@ use Illuminate\Support\Facades\Auth;
 
 class KategoriController extends Controller
 {
+    /**
+     * Menampilkan halaman utama kategori.
+     */
     public function index()
     {
         return view('kategori.kategori');
     }
 
+    /**
+     * Mengambil data kategori untuk tabel dengan fitur filter dan pagination.
+     */
     public function getKategoriData(Request $request)
     {
         $idPengguna = Auth::id();
@@ -20,16 +26,19 @@ class KategoriController extends Controller
 
         $query = Kategori::where('id_pengguna', $idPengguna);
 
+        // Filter berdasarkan tipe (MASUK/KELUAR) jika ada
         if ($tipe && $tipe !== 'semua') {
             $query->where('tipe', $tipe);
         }
 
-        // Paginate tetap 5 sesuai kode awal Anda
         $categories = $query->orderBy('nama_kategori', 'asc')->paginate(5);
 
         return response()->json($categories);
     }
 
+    /**
+     * Menyimpan kategori baru ke database.
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -43,26 +52,33 @@ class KategoriController extends Controller
             'tipe'          => $request->tipe_kategori == 'pemasukan' ? 'MASUK' : 'KELUAR',
         ]);
 
-        // Jika pakai AJAX, gunakan respon JSON ini:
+        // Respon JSON untuk permintaan AJAX
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Kategori berhasil ditambahkan!',
-                'data' => $kategori
+                'data'    => $kategori
             ]);
         }
 
         return redirect()->back()->with('success', 'Kategori berhasil ditambahkan!');
     }
 
+    /**
+     * Mengambil detail satu kategori dalam format JSON.
+     */
     public function show($id)
     {
         $kategori = Kategori::where('id_pengguna', Auth::id())
             ->where('id_kategori', $id)
             ->firstOrFail();
+
         return response()->json($kategori);
     }
 
+    /**
+     * Memperbarui data kategori yang sudah ada.
+     */
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -80,12 +96,15 @@ class KategoriController extends Controller
         ]);
 
         return response()->json([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => 'Kategori berhasil diperbarui',
-            'data' => $kategori
+            'data'    => $kategori
         ]);
     }
 
+    /**
+     * Menghapus kategori dari database.
+     */
     public function destroy($id)
     {
         try {
@@ -96,17 +115,20 @@ class KategoriController extends Controller
             $kategori->delete();
 
             return response()->json([
-                'status' => 'success',
+                'status'  => 'success',
                 'message' => 'Kategori berhasil dihapus!'
             ]);
         } catch (\Exception $e) {
             return response()->json([
-                'status' => 'error',
+                'status'  => 'error',
                 'message' => 'Gagal menghapus data: ' . $e->getMessage()
             ], 500);
         }
     }
 
+    /**
+     * Mengambil seluruh data kategori tanpa pagination untuk kebutuhan dropdown.
+     */
     public function allKategori()
     {
         $categories = Kategori::where('id_pengguna', Auth::id())

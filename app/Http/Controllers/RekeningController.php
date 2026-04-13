@@ -8,97 +8,108 @@ use Illuminate\Support\Facades\Auth;
 
 class RekeningController extends Controller
 {
+    /**
+     * Menampilkan halaman manajemen rekening.
+     */
     public function index()
     {
         return view('rekening.rekening');
     }
 
-    // FUNGSI API untuk mengambil semua data rekening
+    /**
+     * Mengambil data rekening untuk tabel (API) dengan fitur pencarian dan pagination.
+     */
     public function getRekeningData(Request $request)
     {
         $idPengguna = Auth::id();
-        
-        // 1. Tangkap input pencarian dari request JavaScript
         $search = $request->query('search');
 
-        // 2. Hitung total saldo (total saldo biasanya tidak terpengaruh filter pencarian)
+        // Ambil akumulasi total saldo dari semua rekening pengguna
         $totalSaldo = Rekening::where('id_pengguna', $idPengguna)->sum('saldo');
 
-        // 3. Bangun Query untuk data rekening
         $query = Rekening::where('id_pengguna', $idPengguna);
 
-        // 4. Tambahkan Filter Pencarian jika variabel $search tidak kosong
+        // Filter berdasarkan nama rekening jika ada input pencarian
         if (!empty($search)) {
             $query->where('nama_rekening', 'LIKE', '%' . $search . '%');
         }
 
-        // 5. Eksekusi pagination (tetap 5 data per halaman)
         $rekenings = $query->orderBy('created_at', 'desc')->paginate(5);
 
-        // 6. Siapkan response JSON
+        // Tambahkan total saldo keseluruhan ke dalam array respon JSON
         $responseData = $rekenings->toArray();
         $responseData['total_semua_rekening'] = $totalSaldo;
 
         return response()->json($responseData);
     }
 
-    // FUNGSI API untuk menyimpan data rekening baru
+    /**
+     * Menyimpan data rekening baru.
+     */
     public function store(Request $request)
     {
         $request->validate([
             'nama_rekening' => 'required|string|max:100',
-            'saldo' => 'numeric|min:0',
-            'icon' => 'required|string',
-            'warna' => 'required|string',
+            'saldo'         => 'numeric|min:0',
+            'icon'          => 'required|string',
+            'warna'         => 'required|string',
         ]);
 
         $rekening = Rekening::create([
-            'id_pengguna' => Auth::id(),
+            'id_pengguna'   => Auth::id(),
             'nama_rekening' => $request->nama_rekening,
-            'saldo' => $request->saldo,
-            'icon' => $request->icon,
-            'warna' => $request->warna,
+            'saldo'         => $request->saldo,
+            'icon'          => $request->icon,
+            'warna'         => $request->warna,
         ]);
 
         return response()->json($rekening);
     }
 
-    // FUNGSI API untuk mengambil data rekening saat mengklik "Edit"
+    /**
+     * Mengambil data satu rekening untuk ditampilkan (saat akan diedit).
+     */
     public function show(Rekening $rekening)
     {
         return response()->json($rekening);
     }
 
-    // FUNGSI API untuk menyimpan data yang sudah diedit
+    /**
+     * Memperbarui informasi rekening yang sudah ada.
+     */
     public function update(Request $request, Rekening $rekening)
     {
         $request->validate([
             'nama_rekening' => 'required|string|max:100',
-            'saldo' => 'numeric|min:0',
-            'icon' => 'required|string',
-            'warna' => 'required|string',
+            'saldo'         => 'numeric|min:0',
+            'icon'          => 'required|string',
+            'warna'         => 'required|string',
         ]);
 
-        // Gunakan ini agar _token tidak ikut diupdate ke database
+        // Perbarui data hanya pada kolom yang diizinkan (keamanan data)
         $rekening->update($request->only(['nama_rekening', 'saldo', 'icon', 'warna']));
 
         return response()->json($rekening);
     }
 
-    // FUNGSI API untuk menghapus data rekening
+    /**
+     * Menghapus rekening dari database.
+     */
     public function destroy(Rekening $rekening)
     {
         $rekening->delete();
         return response()->json(['message' => 'Rekening berhasil dihapus.']);
     }
 
-    // Tambahkan fungsi ini di RekeningController.php
+    /**
+     * Mengambil seluruh data rekening tanpa pagination (untuk kebutuhan dropdown/pilihan).
+     */
     public function allRekening()
     {
         $idPengguna = Auth::id();
         $rekenings = Rekening::where('id_pengguna', $idPengguna)
                     ->orderBy('nama_rekening', 'asc')
-                    ->get(); // Menggunakan get() bukan paginate() agar semua data keluar
+                    ->get();
 
         return response()->json($rekenings);
     }

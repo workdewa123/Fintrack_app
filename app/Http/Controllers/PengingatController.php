@@ -12,13 +12,17 @@ use Illuminate\Support\Facades\Auth;
 
 class PengingatController extends Controller
 {
-    // Halaman Daftar Pembayaran Reguler
+    /**
+     * Menampilkan halaman daftar pengingat pembayaran reguler.
+     */
     public function index()
     {
-        return view('pengingat.index'); // Langsung return view, data akan di-load via JS
+        return view('pengingat.index');
     }
 
-    // API Data untuk Tabel (Metode yang dipanggil JavaScript)
+    /**
+     * Mengambil data pengingat dalam format JSON untuk tabel (API).
+     */
     public function getPengingatData(Request $request)
     {
         $search = $request->query('search');
@@ -26,21 +30,24 @@ class PengingatController extends Controller
 
         $query = Pengingat::where('id_pengguna', Auth::id())->with(['rekening', 'kategori']);
 
-        // Filter Pencarian
+        // Filter berdasarkan kata kunci nama pembayaran
         if ($search) {
             $query->where('nama_pembayaran', 'LIKE', "%{$search}%");
         }
 
-        // Filter Frekuensi (Semua, Harian, Mingguan, Bulanan)
+        // Filter berdasarkan frekuensi tagihan
         if ($frequency && $frequency !== 'semua') {
-            $query->where('frekuensi', strtoupper($frequency)); // Menyamakan dengan enum HARIAN, MINGGUAN, BULANAN
+            $query->where('frekuensi', strtoupper($frequency));
         }
 
-        // Paginate hasil agar konsisten dengan script JavaScript
         $pengingats = $query->paginate(5);
 
         return response()->json($pengingats);
-    }    // Halaman Form Buat Pengingat (Sesuai Gambar UI)
+    }
+
+    /**
+     * Menampilkan halaman formulir pembuatan pengingat baru.
+     */
     public function create()
     {
         $rekenings = Rekening::where('id_pengguna', Auth::id())->get();
@@ -48,9 +55,12 @@ class PengingatController extends Controller
         return view('pengingat.create', compact('rekenings', 'kategoris'));
     }
 
-    // Simpan Data ke Database
-   public function store(Request $request)
+    /**
+     * Menyimpan data pengingat baru ke database.
+     */
+    public function store(Request $request)
     {
+        // Tetapkan tipe default sebagai 'Pengeluaran' jika tidak ada
         if (!$request->has('tipe')) {
             $request->merge(['tipe' => 'Pengeluaran']);
         }
@@ -69,9 +79,7 @@ class PengingatController extends Controller
         ]);
 
         try {
-            // Masukkan ID user yang sedang login ke dalam data yang akan disimpan
-            $validated['id_pengguna'] = Auth::id(); 
-            
+            $validated['id_pengguna'] = Auth::id();
             Pengingat::create($validated);
             return response()->json(['success' => true, 'message' => 'Pengingat berhasil disimpan!']);
         } catch (\Exception $e) {
@@ -79,12 +87,11 @@ class PengingatController extends Controller
         }
     }
 
-    // Tambahkan ini di PengingatController.php
-
-    // 1. Ambil data detail untuk Modal Detail & Edit
+    /**
+     * Mengambil data detail pengingat untuk ditampilkan di modal.
+     */
     public function show($id)
     {
-        // Ambil data milik user yang login saja
         $pengingat = Pengingat::where('id_pengguna', Auth::id())
             ->with(['kategori', 'rekening'])
             ->findOrFail($id);
@@ -92,7 +99,9 @@ class PengingatController extends Controller
         return response()->json($pengingat);
     }
 
-    // 2. Proses update data dari Modal Edit
+    /**
+     * Memperbarui data pengingat yang sudah ada.
+     */
     public function update(Request $request, $id)
     {
         $pengingat = Pengingat::find($id);
@@ -105,8 +114,8 @@ class PengingatController extends Controller
             'id_rekening'     => 'required|exists:rekenings,id_rekening',
             'id_kategori'     => 'required|exists:kategoris,id_kategori',
             'nama_pembayaran' => 'required|string|max:100',
-            'frekuensi'     => 'required|in:HARIAN,MINGGUAN,BULANAN',
-            'detail_jadwal' => 'nullable|required_if:frekuensi,MINGGUAN,BULANAN|integer',
+            'frekuensi'       => 'required|in:HARIAN,MINGGUAN,BULANAN',
+            'detail_jadwal'   => 'nullable|required_if:frekuensi,MINGGUAN,BULANAN|integer',
             'tanggal_mulai'   => 'required|date',
             'tanggal_akhir'   => 'nullable|date|after_or_equal:tanggal_mulai',
             'jumlah'          => 'required|numeric|min:0',
@@ -122,43 +131,49 @@ class PengingatController extends Controller
         }
     }
 
+    /**
+     * Menghapus data pengingat.
+     */
     public function destroy($id)
     {
         $pengingat = Pengingat::findOrFail($id);
         $pengingat->delete();
-        return redirect()->route('pembayaran.index')
-            ->with('success', 'Pengingat berhasil dihapus');
+
+        return redirect()->route('pembayaran.index')->with('success', 'Pengingat berhasil dihapus');
     }
 
+    /**
+     * Memproses konfirmasi pembayaran dari pengingat ke tabel transaksi.
+     */
     public function konfirmasiBayar($id)
     {
-        $pengingat = \App\Models\Pengingat::findOrFail($id);
+        $pengingat = Pengingat::findOrFail($id);
 
-        \Illuminate\Support\Facades\DB::beginTransaction();
+        DB::beginTransaction();
         try {
-            // 1. Simpan ke tabel Transaksi
-            \App\Models\Transaksi::create([
-                'id_rekening' => $pengingat->id_rekening,
-                'id_kategori' => $pengingat->id_kategori,
-                'jumlah' => $pengingat->jumlah,
+            // 1. Buat catatan transaksi pengeluaran
+            Transaksi::create([
+                'id_rekening'       => $pengingat->id_rekening,
+                'id_kategori'       => $pengingat->id_kategori,
+                'jumlah'            => $pengingat->jumlah,
                 'tanggal_transaksi' => now(),
-                'keterangan' => 'Pembayaran Rutin: ' . $pengingat->nama_pembayaran,
-                'tipe' => 'KELUAR'
+                'keterangan'        => 'Pembayaran Rutin: ' . $pengingat->nama_pembayaran,
+                'tipe'              => 'KELUAR'
             ]);
 
-            // potong saldo rekening
-            $rekening = \App\Models\Rekening::find($pengingat->id_rekening);
+            // 2. Kurangi saldo pada rekening terkait
+            $rekening = Rekening::find($pengingat->id_rekening);
             $rekening->saldo -= $pengingat->jumlah;
             $rekening->save();
 
-            // 3. Update Tanggal Bayar Terakhir pada Pengingat (TAMBAHKAN INI)
+            // 3. Perbarui riwayat tanggal bayar terakhir pada pengingat
             $pengingat->tanggal_bayar_terakhir = now()->toDateString();
             $pengingat->save();
 
-            \Illuminate\Support\Facades\DB::commit();
+            DB::commit();
             return response()->json(['success' => true, 'message' => 'Pembayaran berhasil dikonfirmasi!']);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\DB::rollback();
+            DB::rollback();
             return response()->json(['success' => false, 'message' => 'Gagal: ' . $e->getMessage()]);
         }
     }

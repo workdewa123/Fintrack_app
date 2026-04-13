@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\File;
 use App\Models\Pengguna;
 
 class PenggunaController extends Controller
@@ -97,6 +96,7 @@ class PenggunaController extends Controller
      */
     public function updateProfil(Request $request)
     {
+        /** @var \App\Models\Pengguna $user */
         $user = Auth::user();
 
         $request->validate([

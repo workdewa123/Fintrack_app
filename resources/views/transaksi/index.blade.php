@@ -2,13 +2,13 @@
 
 @section('content')
 <style>
-    /* --- Base Styling --- */
+    /* --- Gaya Dasar & Tipografi --- */
     body {
         font-family: 'Inter', sans-serif;
         background-color: #f8f9fa;
     }
 
-    /* --- Stats Cards --- */
+    /* --- Kartu Statistik --- */
     .card-text-custom {
         font-size: clamp(1.2rem, 3vw, 2rem) !important;
         word-wrap: break-word;
@@ -35,7 +35,7 @@
         border-radius: 1.5rem;
     }
 
-    /* --- Tabs Navigation --- */
+    /* --- Navigasi Tab --- */
     .tabs-container .nav {
         border-bottom: 1px solid #e2e8f0;
     }
@@ -55,7 +55,7 @@
         border-bottom: 3px solid #4a90e2;
     }
 
-    /* --- Table Styling --- */
+    /* --- Gaya Tabel & Kontainer --- */
     .table-container {
         background: white;
         border-radius: 1rem;
@@ -85,7 +85,7 @@
         padding-right: 1.5rem !important;
     }
 
-    /* --- Buttons & UI Elements --- */
+    /* --- Tombol & Elemen UI Kustom --- */
     .btn-action {
         width: 32px;
         height: 32px;
@@ -251,19 +251,22 @@
 
 @push('scripts')
 <script>
-    // --- Global State ---
+    // --- State Global ---
     let currentTipe = 'semua';
     let searchQuery = '';
     let currentPage = 1;
     let transactionIdToDelete = null;
 
+    // Pemformat Angka Rupiah
     const formatter = new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
         minimumFractionDigits: 0
     });
 
-    // --- Core Functions ---
+    // --- Fungsi Inti ---
+
+    // Menampilkan modal sukses kustom
     function showSuccessModal(title, message) {
         document.getElementById('successModalTitle').innerText = title;
         document.getElementById('successModalMessage').innerText = message;
@@ -271,6 +274,7 @@
         successModal.show();
     }
 
+    // Mengambil data transaksi dari server
     function loadTx(page = 1) {
         currentPage = page;
         fetch(`/transaksi/data?page=${page}&tipe=${currentTipe}&search=${searchQuery}`)
@@ -282,9 +286,10 @@
                 renderTable(data.data);
                 renderPagination(data);
             })
-            .catch(err => console.error("Error loading data:", err));
+            .catch(err => console.error("Gagal memuat data:", err));
     }
 
+    // Memuat data rekening ke dropdown modal
     function loadRekeningToModal(targetId = 'rekening', selectedValue = null) {
         fetch('/api/rekening-all')
             .then(res => res.json())
@@ -299,6 +304,7 @@
             });
     }
 
+    // Memuat data kategori ke dropdown modal
     function loadKategoriToModal(targetId = 'kategori', selectedValue = null) {
         fetch('/api/kategori-all')
             .then(res => res.json())
@@ -313,7 +319,9 @@
             });
     }
 
-    // --- Table Rendering ---
+    // --- Fungsi Render ---
+
+    // Mengisi body tabel dengan data transaksi
     function renderTable(items) {
         const body = document.getElementById('txTableBody');
         const emptyState = document.getElementById('emptyState');
@@ -356,6 +364,7 @@
         `).join('');
     }
 
+    // Mengatur navigasi halaman (pagination)
     function renderPagination(data) {
         const info = document.getElementById('txPaginationInfo');
         const links = document.getElementById('txPaginationLinks');
@@ -373,7 +382,9 @@
         }).join('');
     }
 
-    // --- Action Handlers ---
+    // --- Handler Aksi ---
+
+    // Persiapan data untuk modal edit
     window.editTransaksi = function(id) {
         fetch(`/transaksi/${id}`)
             .then(res => res.json())
@@ -393,6 +404,7 @@
             });
     };
 
+    // Menampilkan modal konfirmasi hapus
     window.hapusTransaksi = function(id) {
         transactionIdToDelete = id;
         new bootstrap.Modal(document.getElementById('deleteConfirmModal')).show();
@@ -400,11 +412,12 @@
 
     // --- Event Listeners ---
     document.addEventListener('DOMContentLoaded', function() {
+        // Pemuatan data awal
         loadTx(1);
         loadRekeningToModal();
         loadKategoriToModal();
 
-        // Search Logic
+        // Logika Pencarian (dengan debounce)
         let searchTimer;
         document.getElementById('txSearch')?.addEventListener('input', (e) => {
             clearTimeout(searchTimer);
@@ -412,7 +425,7 @@
             searchTimer = setTimeout(() => loadTx(1), 500);
         });
 
-        // Tab Filter Logic
+        // Logika Filter Berdasarkan Tipe (Masuk/Keluar)
         document.querySelectorAll('.tabs-container .nav-link').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
@@ -423,7 +436,7 @@
             });
         });
 
-        // Category Selection Sync
+        // Sinkronisasi tipe transaksi saat memilih kategori
         document.getElementById('kategori')?.addEventListener('change', function() {
             const tipe = this.options[this.selectedIndex].getAttribute('data-tipe');
             if (tipe) {
@@ -432,7 +445,7 @@
             }
         });
 
-        // Form Add Submission
+        // Pengiriman Form Tambah Transaksi
         document.getElementById('addTransactionForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
             const formData = {
@@ -462,7 +475,7 @@
             });
         });
 
-        // Form Edit Submission
+        // Pengiriman Form Edit Transaksi
         document.getElementById('editTransactionForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
             const id = document.getElementById('editTransaksiId').value;
@@ -489,7 +502,7 @@
             });
         });
 
-        // Confirm Delete Execution
+        // Eksekusi Penghapusan Transaksi
         document.getElementById('confirmDeleteBtn')?.addEventListener('click', function() {
             if (!transactionIdToDelete) return;
             fetch(`/transaksi/${transactionIdToDelete}`, {
