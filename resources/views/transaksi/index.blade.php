@@ -273,7 +273,7 @@
 
     function loadTx(page = 1) {
         currentPage = page;
-        fetch(`/transaksi-data?page=${page}&tipe=${currentTipe}&search=${searchQuery}`)
+        fetch(`/transaksi/data?page=${page}&tipe=${currentTipe}&search=${searchQuery}`)
             .then(res => res.json())
             .then(data => {
                 document.getElementById('statTotal').innerText = formatter.format(data.total_volume || 0);

@@ -301,7 +301,7 @@
     // --- Fungsi Pengambilan Data ---
     function loadRekeningData(page = 1) {
         currentPage = page;
-        fetch(`/rekening-data?page=${page}&search=${searchQuery}`)
+        fetch(`/rekening/data?page=${page}&search=${searchQuery}`)
             .then(response => response.json())
             .then(data => {
                 renderRekeningTable(data.data);
