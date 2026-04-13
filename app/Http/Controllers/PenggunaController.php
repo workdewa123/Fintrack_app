@@ -10,19 +10,25 @@ use App\Models\Pengguna;
 
 class PenggunaController extends Controller
 {
-    // Method untuk menampilkan halaman awal (Landing Page 1)
+    /**
+     * Menampilkan halaman awal (Halaman Selamat Datang).
+     */
     public function showHalamanAwal()
     {
         return view('halaman_awal');
     }
 
-    // Method untuk menampilkan halaman login
+    /**
+     * Menampilkan formulir masuk (Login).
+     */
     public function showLoginForm()
     {
         return view('login');
     }
 
-    // Method untuk memproses login
+    /**
+     * Memproses verifikasi kredensial pengguna (Login).
+     */
     public function authenticate(Request $request)
     {
         $credentials = $request->validate([
@@ -30,6 +36,7 @@ class PenggunaController extends Controller
             'password' => 'required|string',
         ]);
 
+        // Verifikasi username dan password
         if (Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']])) {
             $request->session()->regenerate();
             return redirect()->intended('/beranda')->with('success', 'Selamat datang!');
@@ -38,23 +45,27 @@ class PenggunaController extends Controller
         return back()->withErrors(['username' => 'Username atau kata sandi salah.'])->onlyInput('username');
     }
 
-    // Method untuk menampilkan halaman registrasi
+    /**
+     * Menampilkan formulir pendaftaran akun (Register).
+     */
     public function showRegistrationForm()
     {
         return view('register');
     }
 
-    // Method untuk memproses registrasi
+    /**
+     * Memproses pendaftaran akun pengguna baru.
+     */
     public function register(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:100',
+            'nama'     => 'required|string|max:100',
             'username' => 'required|string|max:50|unique:penggunas,username',
             'password' => 'required|string|min:6|confirmed',
         ]);
 
         Pengguna::create([
-            'nama' => $request->nama,
+            'nama'     => $request->nama,
             'username' => $request->username,
             'password' => Hash::make($request->password),
         ]);
@@ -62,13 +73,17 @@ class PenggunaController extends Controller
         return redirect()->route('login')->with('success', 'Akun berhasil dibuat! Silakan masuk.');
     }
 
-    // Method untuk menampilkan halaman landing page (halaman fitur)
+    /**
+     * Menampilkan halaman fitur aplikasi (Landing Page).
+     */
     public function showLandingPage()
     {
         return view('landing_page');
     }
 
-    // Method untuk logout
+    /**
+     * Menghapus sesi pengguna dan keluar dari aplikasi (Logout).
+     */
     public function logout(Request $request)
     {
         Auth::logout();
@@ -76,27 +91,31 @@ class PenggunaController extends Controller
         $request->session()->regenerateToken();
         return redirect('/login');
     }
+
+    /**
+     * Memperbarui data profil pengguna dan unggahan foto profil.
+     */
     public function updateProfil(Request $request)
     {
-        // Menggunakan Auth::user() untuk mendapatkan model user yang sedang login
         $user = Auth::user();
 
         $request->validate([
-            'nama' => 'required|string|max:100',
-            'username' => 'required|string|max:50|unique:penggunas,username,' . $user->id_pengguna . ',id_pengguna',
+            'nama'        => 'required|string|max:100',
+            'username'    => 'required|string|max:50|unique:penggunas,username,' . $user->id_pengguna . ',id_pengguna',
             'foto_profil' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $user->nama = $request->nama;
         $user->username = $request->username;
 
+        // Proses jika ada unggahan foto profil baru
         if ($request->hasFile('foto_profil')) {
-            // Hapus foto lama jika ada
+            // Hapus berkas foto lama jika ada di direktori
             if ($user->foto_profil && file_exists(public_path('images/profil/' . $user->foto_profil))) {
                 unlink(public_path('images/profil/' . $user->foto_profil));
             }
 
-            // Upload foto baru
+            // Simpan foto profil baru dengan nama unik
             $file = $request->file('foto_profil');
             $namaFile = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('images/profil'), $namaFile);
